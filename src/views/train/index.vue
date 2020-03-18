@@ -8,13 +8,14 @@
  -->
 <template>
     <div style="margin: 100px 18% 40px 18%;position: relative;" >
-                <train-title :title="title" english="Training Center" :ismany="false" ></train-title>      
+                <train-title @emitSearch="onSearchSingle" :title="title" english="Training Center" :ismany="false" ></train-title>      
         <div style="background: #fff;padding: 20px;" >
 
-                            <div v-if="isLoading"  style="line-height: 20px" v-for="(item,index) in documentList" :key="index" >
+                            <div v-if="isLoading&&!isSearchData"  style="line-height: 20px" v-for="(item,index) in documentList" :key="index" >
                                     <items :row="item" :index="index" ></items>
                             </div>
-                            <div v-else style="min-height: 500px;position: relative;" >
+                            <search-item v-if="isSearchData" v-for="(item,index) in documentList"  :search-info="item" :key="index" ></search-item>
+                            <div v-if="!isLoading" style="min-height: 500px;position: relative;" >
                                 <loading></loading>
                             </div>
                             <div v-if="!isNoData&&isLoading" style="min-height: 400px;position: relative;">
@@ -45,12 +46,15 @@ import { getOrgTrains } from "@/api/train"
 import Long from "long"
 import Loading from "@/components/loading"
 import NoData from '@/components/noData'
+import {searchArticles} from "@/api/home"
+import SearchItem from "@/components/search"
 export default {
     components:{
         TrainTitle,
         Items,
         Loading,
-        NoData
+        NoData,
+        SearchItem
     },
     data(){
         return {
@@ -65,6 +69,8 @@ export default {
             documentList:[],
             isLoading:false,
             isNoData:false,
+            fastsearch:null,//搜索参数
+            isSearchData:false,//是否搜索数据
         }
     },
     methods:{
@@ -78,9 +84,11 @@ export default {
             this.current = val
             this.handleGetOrgTrains()
         },
+        //分页获取培训数据
         handleGetOrgTrains({current=this.current,pageSize=this.pageSize}={}){
             getOrgTrains({current,pageSize}).then(response => {
                 this.isLoading = true
+                this.isSearchData = false
                 let page = response.page
                 this.total = page.total
                 if(response && response.value.length>0){
@@ -91,7 +99,32 @@ export default {
                     })
                 }
             })
+        },
+        onSearchSingle(val){
+               this.fastsearch = val
+               this.handleSearch()
+             },
+        //搜索数据 
+        handleSearch({current=this.current,pageSize=this.pageSize,articletype=2,fastsearch=this.fastsearch}={}){
+            this.isLoading = false
+            this.isNoData = false
+            this.isSearchData = true
+            this.documentList = []
+        const data = {
+            current,
+            pageSize,
+            articletype,
+            fastsearch
         }
+        searchArticles(data).then(response => {
+            this.isLoading = true
+            this.total = response.articles.page.total
+            this.documentList = response.articles.value
+            if(response.articles.value && response.articles.value.length>0){
+                this.isNoData = true
+             }
+           })
+        },
     },
     mounted () {
         this.handleGetOrgTrains()

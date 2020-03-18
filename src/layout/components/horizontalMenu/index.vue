@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-02-23 18:16:10
- * @LastEditTime: 2020-02-25 11:58:44
+ * @LastEditTime: 2020-03-18 09:47:51
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\layout\components\horizontalMenu\index.vue
@@ -28,9 +28,10 @@
     <div class="header-content" >
       <!--搜索框--->
       <el-input v-model="fastsearch"  class="header-search" placeholder="请输入" >
-          <template slot="append" >
+        <el-button slot="append" icon="el-icon-search" style="color: #fff" @click="searchEnter"></el-button>
+         <!--  <template slot="append" >
               <i class="el-icon-search" style="color: #fff" @click="searchEnter"  ></i>
-           </template>
+           </template> -->
         </el-input>
     <!-- 登录框--->
      <div class="header-login" v-show="!loginStatue" >
@@ -114,12 +115,6 @@ export default {
         }else{
           this.$router.push({path:'/search',query:{fastsearch:this.fastsearch}})
         }
-        
-        /*   this.bus.$emit('searchData',{fastsearch:this.fastsearch}); */
-          // 定时让其目标组件加载完成
-        /*   setTimeout(()=>{
-            this.bus.$emit('searchData',{fastsearch:this.fastsearch});
-          },1000) */
         
       },
       //用户下拉菜单指令

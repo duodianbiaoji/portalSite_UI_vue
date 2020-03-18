@@ -8,8 +8,8 @@
  -->
 <template>
     <div v-if="detailsData"  style="background: #fff;padding: 20px;margin-top: 40px;">
-        <div style="text-align: center;" >
-            <h2>{{detailsData.title}}</h2>
+        <div>
+            <h2 style="text-align: center;">{{detailsData.title}}</h2>
         </div>
         <div style="text-align: center;" >
             <span>{{detailsData.publishdate}}</span>

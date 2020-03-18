@@ -1,11 +1,16 @@
 <template>
     <div  style="margin: 100px 18% 40px 18%">
-            <honor-title :title="title" english="Company Honors"  :ismany="false"  ></honor-title>
-            <honor-item v-if="isLoading" :honour-data-list="honourDataList" style="margin-bottom: 30px;"></honor-item>
-            <div v-else style="min-height: 500px;position: relative;" >
+            <honor-title @emitSearch="onSearchSingle" :title="title" english="Company Honors"  :ismany="false"  ></honor-title>
+            <honor-item v-if="isLoading&&!isSearchData" :honour-data-list="honourDataList" style="margin-bottom: 30px;"></honor-item>
+                
+                <!-- <search-item v-if="isSearchData" v-for="(item.index) in honourDataList" :key="index" :search-info="item"></search-item> -->
+                <search-item v-if="isSearchData" v-for="(item,index) in honourDataList"  :search-info="item" :key="index" ></search-item>
+            
+
+            <div v-show="!isLoading" style="min-height: 500px;position: relative;" >
                 <loading></loading>
             </div>
-            <div v-if="!isNoData&&isLoading" style="min-height: 400px;position: relative;">
+            <div v-show="!isNoData&&isLoading" style="min-height: 400px;position: relative;">
                 <no-data></no-data>
             </div>
             <el-pagination
@@ -29,6 +34,8 @@ import { getHonours } from "@/api/honor"
 import Long from "long"
 import Loading from "@/components/loading"
 import NoData from "@/components/noData"
+import {searchArticles} from "@/api/home"
+import SearchItem from "@/components/search"
 export default {
     data(){
         return {
@@ -43,6 +50,9 @@ export default {
             isLoading:false,
             isNoData:false,
             honourDataList:[],//列表数据
+            fastsearch:null,
+            isSearchData:false,
+            
         }
     },
     methods:{
@@ -59,6 +69,7 @@ export default {
         handleGetHonour({current=this.current,pageSize=this.pageSize}={}){
             getHonours({current,pageSize}).then(response => {
                 this.isLoading = true
+                this.isSearchData = false
                 if(response.value && response.value.length >0){
                     this.isNoData = true
                     this.total = response.page.total
@@ -68,13 +79,46 @@ export default {
                     })
                 }
             })
+        },
+        onSearchSingle(val){
+            this.fastsearch = val
+        },
+
+        
+        //搜索数据 
+        handleSearch({current=this.current,pageSize=this.pageSize,articletype=5,fastsearch=this.fastsearch}={}){
+            this.isLoading = false
+            this.isNoData = false
+            this.isSearchData = true
+            this.honourDataList = []
+        const data = {
+            current,
+            pageSize,
+            articletype,
+            fastsearch
         }
+        searchArticles(data).then(response => {
+            this.isLoading = true
+            this.total = response.articles.page.total
+            this.honourDataList = response.articles.value
+            if(response.articles.value && response.articles.value.length>0){
+                this.isNoData = true
+            }
+            
+        })
+       },
     },
     components:{
         HonorTitle,
         HonorItem,
         NoData,
-        Loading
+        Loading,
+        SearchItem
+    },
+    watch: {
+        fastsearch(){
+            this.handleSearch()
+        }
     },
     mounted(){
         this.handleGetHonour()

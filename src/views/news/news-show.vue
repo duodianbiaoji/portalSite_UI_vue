@@ -40,7 +40,7 @@ export default {
     },
     computed: {
         detailId(){
-                return this.$route.query.newsid
+                return this.$route.params.newsid
         },
     },
     methods: {

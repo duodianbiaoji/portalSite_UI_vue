@@ -44,7 +44,7 @@ export default {
         }
     },
     mounted(){
-        this.handleGetQualitys();
+        this.handleGetQualitys(1,6);
         
     },
     data(){

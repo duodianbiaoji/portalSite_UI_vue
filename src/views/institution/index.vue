@@ -3,15 +3,19 @@
              <sidebar-menu :get-regulations="handleGetRegulations" class="animated fadeInLeftBig" ></sidebar-menu>      
             <div style="margin: 100px 18% 40px 18%;position: relative;" >
                  <!--头部标题-->
-                    <institution-title :title="title" english="System Document" :ismany="false"  ></institution-title>
+                    <institution-title  @emitSearch="onSearchSingle" :title="title" english="System Document" :ismany="false"  ></institution-title>
 
 
-                    <div v-if="isLoading"  style="line-height: 20px">
+                    <div v-if="isLoading&&!isSearchData"  style="line-height: 20px">
                          <items  v-for="(item,index) in documentList" :key="index"  :row="item" :index="index" ></items>
                     </div>
-                    <div v-else style="min-height: 500px;position: relative;" >
-                       <loading></loading>
-                    </div>
+                   
+
+                    <search-item v-if="isSearchData" v-for="(item,index) in documentList"  :search-info="item" :key="index" ></search-item>
+                    <div v-if="!isLoading" style="min-height: 500px;position: relative;" >
+                        <loading></loading>
+                     </div>
+                    
                     <div v-if="!isNoData&&isLoading" style="min-height: 500px;position: relative;">
                        <no-data></no-data>
                     </div>
@@ -41,13 +45,16 @@ import { getRegulations } from "@/api/institution"
 import Long from "long"
 import Loading from "@/components/loading"
 import NoData from '@/components/noData'
+import {searchArticles} from "@/api/home"
+import SearchItem from "@/components/search"
     export default {
         components:{
             InstitutionTitle,
             SidebarMenu,
             Items,
             Loading,
-            NoData
+            NoData,
+            SearchItem
            
         },
         data(){
@@ -64,6 +71,8 @@ import NoData from '@/components/noData'
                 isLoading:false,
                 isNoData:false,
                 deptid:'-1',
+                fastsearch:null,//搜索参数
+                isSearchData:false,//是否搜索数据
 
             }
         },
@@ -82,6 +91,8 @@ import NoData from '@/components/noData'
             handleGetRegulations({current=this.current,pageSize=this.pageSize,deptid=this.deptid}={}){
                 getRegulations({current,pageSize,deptid}).then(response => {
                 this.isLoading = true
+                this.documentList = []
+                this.isSearchData = false
                 let page = response.page
                 this.total = page.total
                 if(response && response.value.length === 0){
@@ -95,12 +106,44 @@ import NoData from '@/components/noData'
                         return item
                     })
                 }
-            }) 
-            }
+             }) 
+            },
+            
+            onSearchSingle(val){
+               this.fastsearch = val
+             },
+
+        
+        //搜索数据 
+        handleSearch({current=this.current,pageSize=this.pageSize,articletype=4,fastsearch=this.fastsearch}={}){
+            this.isLoading = false
+            this.isNoData = false
+            this.isSearchData = true
+            this.documentList = []
+        const data = {
+            current,
+            pageSize,
+            articletype,
+            fastsearch
+        }
+        searchArticles(data).then(response => {
+            this.isLoading = true
+            this.total = response.articles.page.total
+            this.documentList = response.articles.value
+            if(response.articles.value && response.articles.value.length>0){
+                this.isNoData = true
+             }
+           })
+        },
         },
         mounted () {
                 this.handleGetRegulations()
-        }
+        },
+        watch: {
+          fastsearch(){
+              this.handleSearch()
+           }
+         },
     }
     </script>
     <style lang="scss" scoped >

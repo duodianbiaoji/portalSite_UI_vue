@@ -1,11 +1,3 @@
-<!--
- * @Author: your name
- * @Date: 2020-02-23 18:16:10
- * @LastEditTime: 2020-03-18 10:24:16
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \portalSite_UI_vue\src\views\search\Item.vue
- -->
 <template>
     <div class="search-item" v-if="searchInfo" @click="handleSkipDetail"  >
         <div style="display: flex;justify-content: start;" >
@@ -19,9 +11,9 @@
                 <span>{{searchInfo.publishdate}}</span>
             </div>
         </div>
-        <div class="search-content"> 
-                    <span>{{searchInfo.summary}}</span>
-        </div>
+         <div class="search-content"> 
+                <span>{{searchInfo.summary}}</span>
+         </div>
         
     </div>
 </template>
@@ -49,11 +41,9 @@ export default {
             const articletype = this.searchInfo.articletype
             //跳转信息
             let skip = {
-                skipName:"train-details",
+                skipName:"",
                 skipId:"articleid"
             }
-           
-        
             switch(articletype){
                 case 0:{
                     skip.skipName = "news-show"
@@ -82,6 +72,7 @@ export default {
             }
             let  paramsObj = {}
             paramsObj[skip.skipId] = articleid
+            console.log({name:skip.skipName,params:paramsObj})
             this.$router.push({name:skip.skipName,params:paramsObj})
         }
     }
@@ -141,4 +132,3 @@ export default {
     }
 }
 </style>
-

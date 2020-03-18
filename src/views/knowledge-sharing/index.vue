@@ -1,15 +1,25 @@
 <template>
         <div style="margin: 100px 18% 40px 18%;position: relative;" >
                  <!--头部标题-->
-                    <knowledag-title :title="title" english="Training Center" :ismany="false"  ></knowledag-title>   
+                    <knowledag-title :get-all-data="handleGetKnlgeShares" @emitSearch="onSearchSingle" :title="title" english="Training Center" :ismany="false"  ></knowledag-title>   
 
                  <div style="background: #fff;padding: 20px;" >
-                    <el-button class="all-knowledge" type="primary" @click="handleGetKnlgeShares">所有文章<i class="el-icon-video-play"></i></el-button>
+                        <!-- <el-button class="all-knowledge" type="primary" @click="handleGetKnlgeShares">所有文章<i class="el-icon-video-play"></i></el-button> -->
                         <el-button class="my-knowledge" type="primary" @click="handleMyKnowledge">我的文章<i class="el-icon-video-play"></i></el-button>
                         <el-button class="gorelease-button" type="primary" @click="goRelease">分享我的经验<i class="el-icon-video-play"></i></el-button>
-                                <div  style="line-height: 20px" v-for="(item,index) in documentList" :key="index" >
+                                <div v-if="isLoading&&!isSearchData"  style="line-height: 20px" v-for="(item,index) in documentList" :key="index" >
                                         <items :row="item" :isMyKnow="isMyKnow" :getMyKnowledge="handleMyKnowledge"  ></items>
                                 </div>
+
+                                <search-item v-if="isSearchData" v-for="(item,index) in documentList"  :search-info="item" :key="index" ></search-item>
+                                
+                                <div v-if="!isLoading" style="min-height: 500px;position: relative;" >
+                                     <loading></loading>
+                                </div>
+                    
+                                 <div v-if="!isNoData&&isLoading" style="min-height: 500px;position: relative;">
+                                    <no-data></no-data>
+                                 </div>
                     <el-pagination
                        background 
                       :page-size="pageSize"
@@ -35,11 +45,18 @@
     import Long from "long"
     import {getCurrentUserShares,getKnlgeShares,getGoodKnlgeShares } from "@/api/knowledge-sharing"
     import { isLogin } from "@/utils/validate"
+    import Loading from "@/components/loading"
+    import NoData from '@/components/noData'
+    import {searchArticles} from "@/api/home"
+    import SearchItem from "@/components/search"
     export default {
         components:{
         /*     Item, */
             KnowledagTitle,
-            Items
+            Items,
+            Loading,
+            NoData,
+            SearchItem
         },
         data(){
             return {
@@ -53,10 +70,17 @@
                         nameRight:'共享'
                 },
                 documentList:[],
-                goodKnlgeShares:[]
+                goodKnlgeShares:[],
+                isLoading:false,
+                isNoData:false,
+                fastsearch:null,//搜索参数
+                isSearchData:false,//是否搜索数据
             }
         },
-        computed: {
+        watch: {
+            fastsearch(){
+              this.handleSearch()
+           }
         },
         methods:{
             // pagesize 变化回调
@@ -87,36 +111,78 @@
                               item.id = (Long.fromValue(item.id)).toString()
                               return item 
                             })
-                          
                 })
             },
             //分页获取所有的文章列表
            async handleGetKnlgeShares({current=this.current,pageSize=this.pageSize}={}){
                await this.handleGetGoodKnlgeShares()
                 getKnlgeShares({current,pageSize}).then(response=>{
+                        this.isLoading = true
                         this.isMyKnow = false;//游客
+                        this.isSearchData = false
+
+
                         let page = response.page    
                         this.total  = page.total + (this.goodKnlgeShares.length)
                         this.documentList = response.value.map(item => {
                               item.id = (Long.fromValue(item.id)).toString()
                               return item 
                             })
-                            console.log(this.goodKnlgeShares)
                         this.documentList=[...this.goodKnlgeShares,...this.documentList]
+                        if( this.documentList.length > 0){
+                            this.isNoData = true
+                        }
                 
                 })
             },
+            
+            onSearchSingle(val){
+               this.fastsearch = val
+             },
+        //搜索数据 
+         handleSearch({current=this.current,pageSize=this.pageSize,articletype=6,fastsearch=this.fastsearch}={}){
+           //状态初始化
+            this.isLoading = false
+            this.isNoData = false
+            this.isSearchData = true
+            this.documentList = []
+
+        const data = {
+            current,
+            pageSize,
+            articletype,
+            fastsearch
+        }
+        searchArticles(data).then(response => {
+            this.isLoading = true
+            this.total = response.articles.page.total
+            this.documentList = response.articles.value
+            if(response.articles.value && response.articles.value.length>0){
+                this.isNoData = true
+             }
+           })
+         },
             //我的文章
             handleMyKnowledge({current=this.current,pageSize=this.pageSize}={}){
                     if(isLogin()){
+                          //状态初始化
+                           this.isLoading = false
+                           this.isNoData = false
+                           this.isSearchData = false
+                           this.documentList = []
+
                         getCurrentUserShares({current,pageSize}).then(response => {
                                 this.isMyKnow = true //用户
+                                this.isLoading = true
                                 let page = response.page
                                 this.total  = page.total
                                 this.documentList = response.value.map(item => {
                                     item.id = (Long.fromValue(item.id)).toString()
                                     return item
                                 })
+                                if(this.documentList.length > 0){
+                                    this.isNoData = true
+                                }
                         })
                     }else {
                             this.$message({
@@ -157,12 +223,12 @@
     .gorelease-button {
                 position: absolute;
                 top: 0%;
-                right: 24%;
+                right: 31%;
     }
     .my-knowledge {
         position: absolute;
         top: 0%;
-        right: 36%;
+        right: 43%;
     }
     .all-knowledge {
         position: absolute;

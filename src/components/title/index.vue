@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-03-02 22:37:23
- * @LastEditTime: 2020-03-03 16:07:13
+ * @LastEditTime: 2020-03-18 09:41:36
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\components\title\index.vue
@@ -17,10 +17,12 @@
                 </router-link>
             </div>
             <el-input v-model="searchVlaue" v-if="isSearch" placeholder="请输入名称"  class="institution-search" >
-                <template slot="append">
-                    <i class="el-icon-search" style="color: #fff" @click="callback(searchVlaue)" ></i>
-                </template>
+                <el-button slot="append" icon="el-icon-search" style="color: #fff" @click="emitSearchValue"></el-button>
+                <!-- <template slot="append">
+                    <i class="el-icon-search" style="color: #fff" @click="emitSearchValue" ></i>
+                </template> -->
             </el-input>
+            <el-button type="primary" @click="getAllData" v-if="isSearch" class="institution-all" >全部<i class="el-icon-video-play"></i></el-button>
    </div>
 </template>
 
@@ -51,14 +53,25 @@ props:{
         type:String,
         default:''
     },
-    callback:{
+    getAllData:{
         type:Function
     },
     isSearch:{
         type:Boolean,
         default:true,
     }
-}
+  },
+  methods: {
+      emitSearchValue(){
+          if(this.searchVlaue === null || this.searchVlaue === ""){
+              this.$message.warning("请填写搜索内容")
+          }else{
+            this.$emit("emitSearch",this.searchVlaue)
+          }
+         
+      }
+  }
+
 }
 </script>
 

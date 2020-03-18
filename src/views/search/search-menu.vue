@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-02-23 18:16:10
- * @LastEditTime: 2020-03-17 13:19:42
+ * @LastEditTime: 2020-03-18 09:26:22
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\views\search\search-menu.vue
@@ -9,11 +9,11 @@
 <template>
         <div>
             <dl class="list nigiri" style="transform: perspective(1200px);font-size: 14px;font-weight: 600;" >
-                   <el-badge v-for="(item,index) in informationCategory" :max="99" :key="index" :value="item.count" class="item" >
-                     <span>
-                         <dd>{{item.articletypeStr}}</dd>
+                   <!-- <el-badge v-for="(item,index) in informationCategory" :max="99" :key="index" :value="item.count" class="item" > -->
+                     <span v-for="(item,index) in informationCategory" :key="index" @click="searchArticles({articletype:item.articletype})">
+                         <dd>{{item.articletypeStr}}<span>({{item.count}})</span></dd>
                     </span>
-                  </el-badge>
+                  <!-- </el-badge> -->
             </dl>
         </div>
     </template>
@@ -25,9 +25,12 @@
             }
         },
         props:{
-            informationCategory:{
+            informationCategory:{ //信息类别
                 type:Array,
                 default:[]
+            },
+            searchArticles:{  //检索方法
+                type:Function
             }
         }
     }

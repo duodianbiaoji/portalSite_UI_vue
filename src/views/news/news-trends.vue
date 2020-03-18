@@ -5,11 +5,20 @@
              
             </el-carousel-item>
         </el-carousel>
-        <div style="margin: 18px 18%;background-color: #fff;padding: 20px;" >
-            <news-title :title="title" english="New Information" :ismany="false" :callback="handleSearch" ></news-title>
-            <div v-if="isloading">
+          <div style="margin: 18px 18%;background-color: #fff;padding: 20px;" >
+            <news-title @emitSearch="onSearchSingle" :title="title" english="New Information" :ismany="false" :callback="handleSearch" ></news-title>
+            <div v-if="isloading&&!isSearchData">
                 <item v-for="(news,index) in newsData" :row="news" :index="index" :key="index"   ></item>
-                <el-pagination
+                
+            </div>
+            <search-item v-if="isSearchData" v-for="(item,index) in newsData"  :search-info="item" :key="index" ></search-item>
+            <div v-if="!isloading" style="min-height: 400px; position: relative;">
+                <loading></loading>
+            </div>
+            <div v-if="!isNoData&&isloading" style="min-height: 400px;position: relative;">
+                <no-data></no-data>
+             </div>
+             <el-pagination
                    background 
                   :page-size="pageSize"
                   :total="total"
@@ -20,14 +29,7 @@
                   next-text="下一页"
                   @size-change="handleSizeChange"
                   @current-change="handleCurrentChange">
-                </el-pagination>
-            </div>
-            <div v-else style="min-height: 400px; position: relative;">
-                <loading></loading>
-            </div>
-            <div v-if="!isNoData&&isloading" style="min-height: 400px;position: relative;">
-                <no-data></no-data>
-             </div>
+            </el-pagination>
         </div>
         
     </div>
@@ -40,6 +42,8 @@ import { getNewList } from '@/api/news'
 import Loading from '@/components/loading'
 import NoData from '@/components/noData'
 import Long from "long"
+import {searchArticles} from "@/api/home"
+import SearchItem from "@/components/search"
     export default {
         data(){
             return{
@@ -54,6 +58,8 @@ import Long from "long"
                     nameRight:'动态'
                 },
                 isNoData:false,
+                fastsearch:null,//搜索参数
+                isSearchData:false,//是否搜索数据
             }
         },
         mounted(){
@@ -64,7 +70,8 @@ import Long from "long"
             Item,
             Breadcrumd,
             Loading,
-            NoData
+            NoData,
+            SearchItem
         },
         props:{
                 id: {default:1}
@@ -90,6 +97,7 @@ import Long from "long"
                     }
                     let page = response.page
                     this.isloading = true
+                    this.isSearchData = false
                     this.total = page.total
                     this.newsData = response.value
                     this.newsData.map(item=>{
@@ -97,10 +105,33 @@ import Long from "long"
                         })
                 })
             },
-            handleSearch(name){
-                console.log(`这是名称`,name)
-            }
+           
+            handleSearch({current=this.current,pageSize=this.pageSize,articletype=0,fastsearch=this.fastsearch}={}){
+            this.isloading = false
+            this.isNoData = false
+            this.isSearchData = true
+            this.newsData = []
+        const data = {
+            current,
+            pageSize,
+            articletype,
+            fastsearch
         }
+        searchArticles(data).then(response => {
+            this.isloading = true
+            this.total = response.articles.page.total
+            this.newsData = response.articles.value
+            if(response.articles.value && response.articles.value.length>0){
+                this.isNoData = true
+             }
+           })
+          },
+          onSearchSingle(val){
+               this.fastsearch = val
+               this.handleSearch()
+            },
+        },
+       
     }
 </script>
 <style>

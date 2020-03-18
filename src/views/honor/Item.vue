@@ -1,4 +1,5 @@
 <template>
+    <!--作废效果-->
     <div class="port-2 effect-2">
         <div class="image-box">
             <img :src="imageUrl" >

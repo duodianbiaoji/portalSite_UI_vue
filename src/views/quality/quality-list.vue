@@ -8,9 +8,12 @@
  -->
 <template>
         <div style="margin: 100px 18% 40px 18%;background: #fff;padding: 20px;" >
-                <quality-title :title="title" english="Quality Information" :ismany="false" ></quality-title>
-                <quality-item v-if="isLoading" :qualityData="qualityData"></quality-item>
-                <div v-else style="min-height: 250px;position: relative;" >
+                <quality-title @emitSearch="onSearchSingle" :title="title" english="Quality Information" :ismany="false" ></quality-title>
+                <quality-item v-if="isLoading&&!isSearchData" :qualityData="qualityData"></quality-item>
+                
+                <search-item v-if="isSearchData" v-for="(item,index) in qualityData"  :search-info="item" :key="index" ></search-item>
+                
+                <div v-if="!isLoading" style="min-height: 250px;position: relative;" >
                     <loading></loading>
                 </div>
                 <div v-if="!isNoData&&isLoading" style="min-height: 250px;position: relative;">
@@ -38,21 +41,23 @@ import { getQualitys } from '@/api/quality'
 import Long from 'long'
 import Loading from "@/components/loading"
 import NoData from '@/components/noData'
-
+import {searchArticles} from "@/api/home"
+import SearchItem from "@/components/search"
     export default {
         components:{
             QualityTitle,
             QualityItem,
             NoData,
-            Loading
+            Loading,
+            SearchItem
   
         },
         data(){
             return{
-                pageSize:10,
+                pageSize:1,
                 current:1,
                 total:0,
-                pageSizes:[10,20,30,40],
+                pageSizes:[1,20,30,40],
                 title:{
                     nameLeft:"质量",
                     nameRight:"信息"
@@ -60,6 +65,8 @@ import NoData from '@/components/noData'
                 isNoData:false,
                 isLoading:false,
                 qualityData:[],
+                fastsearch:null,//搜索参数
+                isSearchData:false,//是否搜索数据
                
             }
         },
@@ -67,12 +74,21 @@ import NoData from '@/components/noData'
                 // pagesize 变化回调
                 handleSizeChange(val){
                     this.pageSize = val
-                    this.handleGetQualitys()
+                    if(this.isSearchData){
+                       this.handleSearch()
+                    }else{
+                       this.handleGetQualitys()
+                    }
+                   
                 },
                 //current 变化回调
                 handleCurrentChange(val){
                     this.current = val
-                    this.handleGetQualitys()
+                    if(this.isSearchData){
+                       this.handleSearch()
+                    }else{
+                       this.handleGetQualitys()
+                    }
                 },
                 //分页获取质量列表
                 handleGetQualitys({current=this.current,pageSize=this.pageSize}={}){
@@ -80,6 +96,7 @@ import NoData from '@/components/noData'
                           let page = response.page
                           this.total = page.total
                           this.isLoading = true
+                          this.isSearchData = false
                          if(response.value.length > 0){
                              this.isNoData = true
                              this.qualityData = response.value.map(item => {
@@ -89,7 +106,34 @@ import NoData from '@/components/noData'
                        }
                 
                    })
-               }
+               },
+                //监听搜索数据
+            onSearchSingle(val){
+               this.fastsearch = val
+               this.handleSearch()
+             },
+        //搜索数据 
+        handleSearch({current=this.current,pageSize=this.pageSize,articletype=3,fastsearch=this.fastsearch}={}){
+            this.isLoading = false
+            this.isNoData = false
+            this.isSearchData = true
+            this.qualityData = []
+        const data = {
+            current,
+            pageSize,
+            articletype,
+            fastsearch
+        }
+        searchArticles(data).then(response => {
+            this.isLoading = true
+            this.total = response.articles.page.total
+            this.qualityData = response.articles.value
+            if(response.articles.value && response.articles.value.length>0){
+                this.isNoData = true
+             }
+           })
+        },
+
         },
         mounted () {
             this.handleGetQualitys()
