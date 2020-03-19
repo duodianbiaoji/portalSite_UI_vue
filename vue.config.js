@@ -36,6 +36,15 @@ module.exports = {
       }
     },
   },
+  pwa: {
+    iconPaths: {
+      favicon32: 'favicon.ico',
+      favicon16: 'favicon.ico',
+      appleTouchIcon: 'favicon.ico',
+      maskIcon: 'favicon.ico',
+      msTileImage: 'favicon.ico'
+    }
+  },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
     // it can be accessed in index.html to inject the correct title.

@@ -1,14 +1,14 @@
 <!--
  * @Author: your name
  * @Date: 2020-02-23 18:16:10
- * @LastEditTime: 2020-03-03 17:46:41
- * @LastEditors: your name
+ * @LastEditTime: 2020-03-19 09:35:48
+ * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\views\notice\notice-trends.vue
  -->
 <template>
     <div style="margin: 100px 18% 40px 18%;background: #fff;padding: 20px;" >
-        <notice-title  @emitSearch="onSearchSingle" :title="title"  english="Top Notices"  :ismany="false" ></notice-title>
+        <notice-title :get-all-data="handleGetNoticeList"  @emitSearch="onSearchSingle" :title="title"  english="Top Notices"  :ismany="false" ></notice-title>
         <notice-item v-if="isLoading&&!isSearchData" :noticeData="noticeData"></notice-item>
         <search-item v-if="isSearchData" v-for="(item,index) in noticeData"  :search-info="item" :key="index" ></search-item>
         <div v-if="!isLoading" style="min-height: 550px;position: relative;">

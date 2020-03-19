@@ -3,7 +3,7 @@
              <sidebar-menu :get-regulations="handleGetRegulations" class="animated fadeInLeftBig" ></sidebar-menu>      
             <div style="margin: 100px 18% 40px 18%;position: relative;" >
                  <!--头部标题-->
-                    <institution-title  @emitSearch="onSearchSingle" :title="title" english="System Document" :ismany="false"  ></institution-title>
+                    <institution-title :get-all-data="handleGetRegulations"  @emitSearch="onSearchSingle" :title="title" english="System Document" :ismany="false"  ></institution-title>
 
 
                     <div v-if="isLoading&&!isSearchData"  style="line-height: 20px">

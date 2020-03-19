@@ -1,14 +1,14 @@
 <!--
  * @Author: your name
  * @Date: 2020-02-23 18:16:10
- * @LastEditTime: 2020-03-16 10:50:27
+ * @LastEditTime: 2020-03-19 09:36:17
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\views\quality\quality-list.vue
  -->
 <template>
         <div style="margin: 100px 18% 40px 18%;background: #fff;padding: 20px;" >
-                <quality-title @emitSearch="onSearchSingle" :title="title" english="Quality Information" :ismany="false" ></quality-title>
+                <quality-title :get-all-data="handleGetQualitys" @emitSearch="onSearchSingle" :title="title" english="Quality Information" :ismany="false" ></quality-title>
                 <quality-item v-if="isLoading&&!isSearchData" :qualityData="qualityData"></quality-item>
                 
                 <search-item v-if="isSearchData" v-for="(item,index) in qualityData"  :search-info="item" :key="index" ></search-item>

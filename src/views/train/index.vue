@@ -1,15 +1,15 @@
 <!--
  * @Author: your name
  * @Date: 2020-02-23 18:16:10
- * @LastEditTime: 2020-03-16 10:57:47
+ * @LastEditTime: 2020-03-19 09:36:52
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\views\train\index.vue
  -->
 <template>
     <div style="margin: 100px 18% 40px 18%;position: relative;" >
-                <train-title @emitSearch="onSearchSingle" :title="title" english="Training Center" :ismany="false" ></train-title>      
-        <div style="background: #fff;padding: 20px;" >
+                <train-title :get-all-data="handleGetOrgTrains" @emitSearch="onSearchSingle" :title="title" english="Training Center" :ismany="false" ></train-title>      
+                         <div style="background: #fff;padding: 20px;" >
 
                             <div v-if="isLoading&&!isSearchData"  style="line-height: 20px" v-for="(item,index) in documentList" :key="index" >
                                     <items :row="item" :index="index" ></items>

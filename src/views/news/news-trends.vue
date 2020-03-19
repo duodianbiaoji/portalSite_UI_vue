@@ -6,7 +6,7 @@
             </el-carousel-item>
         </el-carousel>
           <div style="margin: 18px 18%;background-color: #fff;padding: 20px;" >
-            <news-title @emitSearch="onSearchSingle" :title="title" english="New Information" :ismany="false" :callback="handleSearch" ></news-title>
+            <news-title :get-all-data="handleGetNewList" @emitSearch="onSearchSingle" :title="title" english="New Information" :ismany="false" :callback="handleSearch" ></news-title>
             <div v-if="isloading&&!isSearchData">
                 <item v-for="(news,index) in newsData" :row="news" :index="index" :key="index"   ></item>
                 
@@ -80,12 +80,21 @@ import SearchItem from "@/components/search"
             // pagesize 变化回调
             handleSizeChange(val){
                 this.pageSize = val
-                this.handleGetNewList()
+                if(this.isSearchData){
+                    this.handleSearch()
+                }else{
+                    this.handleGetNewList()
+                }
+               
             },
             //current 变化回调
             handleCurrentChange(val){
                 this.current = val
-                this.handleGetNewList()
+                if(this.isSearchData){
+                    this.handleSearch()
+                }else{
+                    this.handleGetNewList()
+                }
             },
             /**
              * 获取分页新闻列表
@@ -111,7 +120,7 @@ import SearchItem from "@/components/search"
             this.isNoData = false
             this.isSearchData = true
             this.newsData = []
-        const data = {
+          const data = {
             current,
             pageSize,
             articletype,

@@ -1,6 +1,6 @@
 <template>
     <div  style="margin: 100px 18% 40px 18%">
-            <honor-title @emitSearch="onSearchSingle" :title="title" english="Company Honors"  :ismany="false"  ></honor-title>
+            <honor-title :get-all-data="handleGetHonour" @emitSearch="onSearchSingle" :title="title" english="Company Honors"  :ismany="false"  ></honor-title>
             <honor-item v-if="isLoading&&!isSearchData" :honour-data-list="honourDataList" style="margin-bottom: 30px;"></honor-item>
                 
                 <!-- <search-item v-if="isSearchData" v-for="(item.index) in honourDataList" :key="index" :search-info="item"></search-item> -->

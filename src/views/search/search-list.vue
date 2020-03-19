@@ -1,16 +1,16 @@
 <!--
  * @Author: your name
  * @Date: 2020-02-23 18:16:10
- * @LastEditTime: 2020-03-18 10:12:36
+ * @LastEditTime: 2020-03-19 09:48:47
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\views\search\search-list.vue
  -->
 <template>
     <div  class="search" >
-        <search-menu :search-articles="handleSearchSingle"  :information-category="informationCategory" ></search-menu>
+        <search-menu  :search-articles="handleSearchSingle"  :information-category="informationCategory" ></search-menu>
         <div class="search-content">
-            <search-title @emitSearch="onSearchSingle" :title="title" english="Search Result" :ismany="false" ></search-title>
+            <search-title :get-all-data="handleSearchSingle"  @emitSearch="onSearchSingle" :title="title" english="Search Result" :ismany="false" ></search-title>
             <item v-for="(item,index) in infoDataList" :searchInfo="item" :key="index" ></item> 
 
            <el-pagination
@@ -79,10 +79,11 @@ export default {
             searchArticles(data).then(response => {
                 this.total = response.articles.page.total
                 this.informationCategory = response.categorys
-                console.log("www",this.informationCategory)
+               
                 this.infoDataList = response.articles.value
             })
         },
+        //局部搜索
         handleSearchSingle({current=this.current,pageSize=this.pageSize,articletype=-1,fastsearch=this.fastsearchSingle}={}){
         
             const data = {
@@ -92,7 +93,7 @@ export default {
                 fastsearch
             }
             this.articletype = articletype
-            console.log(data)
+          
             searchArticles(data).then(response => {
                 this.total = response.articles.page.total
                 this.infoDataList = response.articles.value
