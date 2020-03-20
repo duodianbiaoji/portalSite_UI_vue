@@ -1,45 +1,24 @@
+<!--
+ * @Author: your name
+ * @Date: 2020-02-23 18:16:10
+ * @LastEditTime: 2020-03-20 10:42:40
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \portalSite_UI_vue\src\views\knowledge-sharing\details.vue
+ -->
 <template>
         <div style="margin:100px 18% 20px 18%;" >
                 <div >
                         <breadcrumd  ></breadcrumd>
                 </div>
-                <div v-if="detailsData"  style="background: #fff;padding: 20px;margin-top: 40px;">
-                        <div  >
-                            <h2 style="text-align: center;">{{detailsData.title}}</h2>
-                        </div>
-                        <div style="text-align: center;" >
-                            <span>{{detailsData.publishdate}}</span>
-                            <span style="margin-left: 20px">发布人:{{detailsData.author}}</span>
-                            <span style="margin-left: 20px" >浏览量:{{detailsData.pageview}}</span>
-                        </div>
-                        <div style="width: 100%;height: 100%;background: #fff;overflow: hidden;border-top: 1px solid #666;" >
-                            <span v-html="detailsData.content" ></span>
-                        </div>
-
-
-                        <div style="cursor: pointer;" >
-                                <div style="height: 40px;background: #f3f1f1;line-height: 40px;" >
-                                    <h3 style="margin-left:20px;" >附件</h3>
-                                </div>
-                                <div v-for="(item,index) in detailsData.annexes" :key="index" style="position: relative;height: 80px;" >
-                                    <div style="position: absolute;font-size:50px;top: 50%;transform: translateY(-40%)" >
-                                        <i class="el-icon-document"></i>
-                                    </div>
-                                    <div style="position: absolute;left: 6%;top: 20%;" >
-                                        <span style="text-align:center" >{{item.name}}</span>
-                                    </div>
-                                    <div style="position: absolute;left: 6%;top: 60%" >
-                                           <!-- <el-button type="primary" round  >预览</el-button> -->
-                                           <el-button type="primary" round @click="handleFileDownLoad(item)" >下载</el-button>
-                                    </div>
-                                </div>
-                         </div>
-                </div>
-                <div v-else style="min-height: 500px;position: relative;" >
+                <!--详情-->
+                <detail :is-share="true" :detailType="detailType" v-show="loading" detailName="articleid" @emitIsLoading="getLoading" :getDetail="getKnlgeShareDetail" :detailId="detailId"></detail>
+               
+                <comment  v-if="isOpenComment" :detailId="detailId"></comment>
+                <div v-if="!loading" style="min-height: 500px;position: relative;" >
                     <loading></loading>
                 </div>
-        </div>
-        
+         </div>
     </template>
     
     <script>
@@ -49,49 +28,34 @@ import {fileDownload} from '@/api/files'
 import { download } from '@/utils/commonality'
 import Long from "long"
 import Loading from "@/components/loading"
+import Detail from "@/components/detail"
+import Comment from "@/components/comment"
     export default {
         data(){
             return{
                 detailsData:null,
+                detailType:0,
+                loading:false,
+                isOpenComment:false,
             }
         },
         computed:{
-            articleId(){
+            //详情id
+            detailId(){
                 return this.$route.params.articleid
             }
         },
         methods:{
-            //获取分享详情
-            handleGetKnlgeShareDetail(){
-              const data = {
-                   articleid:this.articleId,
-                   type:0
-                 
-              }
-              getKnlgeShareDetail(data).then(response=>{
-                  if(response !== undefined && response){
-                       response.annexes = response.annexes.map(item =>{
-                           item.fid = (Long.fromValue(item.fid)).toString()
-                           return item
-                       })
-                       this.detailsData = response
-                       console.log(this.detailsData)
-                       
-                    }
-              })
+            getKnlgeShareDetail,
+            //获取加载状态
+            getLoading(val){
+               this.loading = true
             },
-            //文件下载
-            handleFileDownLoad(file){
-                const fileId = (Long.fromValue(file.fid)).toString()
-                fileDownload({fid:fileId}).then(response => {
-                     download(response,file.name)
-                })
-                
-            },
-            
         },
         mounted(){
-            this.handleGetKnlgeShareDetail()
+           this.bus.$on("isOpenComment",msg => {
+               this.isOpenComment = msg
+           })
             let routes = [
                 {
                   name:"知识共享",
@@ -106,7 +70,9 @@ import Loading from "@/components/loading"
         },
         components:{
             Breadcrumd,
-            Loading
+            Loading,
+            Detail,
+            Comment
         }
     }
     </script>

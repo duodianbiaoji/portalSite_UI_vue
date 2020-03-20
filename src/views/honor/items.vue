@@ -56,7 +56,6 @@
         .persion-content {
             position: relative;
             height: 260px;
-            background-image:url('../../assets/images/beijing.png');
             cursor: pointer;
           
         }
@@ -71,7 +70,7 @@
         .persion-details {
             width: 100%;
             height: 100%;
-            background-color: rgba(24, 131, 202,0.8);
+            background-color: rgba(116, 118, 119, 0.8);
             position: absolute;
             top:0%;
             opacity: 0;
@@ -85,13 +84,7 @@
             transform: translate(-50%,-50%);
         }
         .persion-content-p {
-           /*  display: -webkit-box;
-            -webkit-line-clamp: 4;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            -webkit-box-orient: vertical;
-            -moz-box-orient: vertical;
-            -moz-line-clamp:4; */
+
             position: relative;
             line-height: 20px;
             overflow: hidden;

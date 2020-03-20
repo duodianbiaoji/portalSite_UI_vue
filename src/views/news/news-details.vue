@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-02-23 18:16:10
- * @LastEditTime: 2020-03-19 09:15:43
+ * @LastEditTime: 2020-03-20 09:31:14
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\views\news\news-details.vue
@@ -9,10 +9,9 @@
 <template>
       
                 <div class="news-details" v-if="activeInfo">
-                       <!--  <img :src="scrUrl" alt=""  > -->
-                        <el-image :src="scrUrl" :preview-src-list="srcUrlList">
-                                <div slot="error" class="image-slot">
-                                    <i class="el-icon-picture-outline"></i>
+                        <el-image :src="scrUrl">
+                                <div slot="placeholder" class="image-slot">
+                                        加载中<span class="dot">...</span>
                                 </div>
                         </el-image>
                         <p >{{activeInfo.title}}</p>
@@ -20,7 +19,6 @@
                         font-size: 20px;
                         line-height: 26px;
                         font-family: cursive;" >
-                                {{activeInfo.summary}}
                         </span>
                             
                 </div>
@@ -32,7 +30,7 @@ export default {
         data(){
                 return{
                         scrUrl:null,
-                        srcUrlList:[]
+                       
                 }
         },
         props:{
@@ -46,7 +44,7 @@ export default {
         watch: {
                 activeInfo(){
                         this.scrUrl = `${process.env.VUE_APP_BASE_API}/${this.activeInfo.imageUrl}`
-                        this.srcUrlList = [this.scrUrl]
+                       
                 }
         }
 }

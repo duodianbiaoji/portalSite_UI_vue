@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-03-15 22:01:20
- * @LastEditTime: 2020-03-16 10:42:14
+ * @LastEditTime: 2020-03-20 11:11:29
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\components\detail\index.vue
@@ -19,9 +19,9 @@
         <div style="width: 100%;height: 100%;background: #fff;overflow: hidden;border-top: 1px solid #666;" >
             <span v-html="detailsData.content" ></span>
         </div>
+        <share v-if="isShare" :detailId="detailId" :good-num="detailsData.goodnum" :bad-num="detailsData.badnum" :cmt-count="detailsData.cmtCount"></share>
 
-
-        <div style="cursor: pointer;" >
+        <div style="cursor: pointer;" v-if="isFile" >
                 <div style="height: 40px;background: #f3f1f1;line-height: 40px;" >
                     <h3 style="margin-left:20px;" >附件</h3>
                 </div>
@@ -38,17 +38,20 @@
                     </div>
                 </div>
          </div>
-</div>
+        
+    </div>
 </template>
 <script>
 import { fileDownload } from '@/api/files'
 import { download } from '@/utils/commonality'
 import Long from "long" 
+import Share from "@/components/detail/share"
     export default {
         data(){
             return{
                 detailsData:null,
                 isLoading:false,
+                isFile:false,
             }
         },
         watch: {
@@ -56,6 +59,7 @@ import Long from "long"
                 this.$emit("emitIsLoading",this.isLoading)
             }
         },
+    
         props:{
             detailId:{
                 type:String
@@ -66,25 +70,42 @@ import Long from "long"
             detailName:{
                 type:String
             },
+            detailType:{
+                type:Number
+            },
+            isShare:{
+                type:Boolean,
+                default:false
+            }
             
+        },
+        components:{
+            Share
         },
         methods:{
             //获取分享详情
             handleGetKnlgeShareDetail(){
             let detailName = this.detailName
-           
-              const data = {}
+            const data = {}
+            if(this.detailType !== undefined && this.detailType !== null){
+                data["type"] = this.detailType
+            }
+             
               data[detailName] = this.detailId
-              console.log(data)
+             
               this.getDetail(data).then(response=>{
                   if(response !== undefined && response){
                        this.isLoading = true
-                       response.annexes = response.annexes.map(item =>{
-                           item.fid = (Long.fromValue(item.fid)).toString()
-                           return item
-                       })
+                      
+                       if(response.annexes.length > 0){
+                           this.isFile = true
+                           response.annexes = response.annexes.map(item =>{
+                            item.fid = (Long.fromValue(item.fid)).toString()
+                            return item
+                          })
+                        }
                        this.detailsData = response
-                       console.log(this.detailsData)
+                      
                     }
               })
             },

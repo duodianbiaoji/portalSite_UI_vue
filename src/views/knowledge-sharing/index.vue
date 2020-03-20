@@ -60,7 +60,7 @@
         },
         data(){
             return {
-                pageSize:50,
+                pageSize:5,
                 current:1,
                 total:0,
                 pageSizes:[5,10,20,40],
@@ -106,22 +106,20 @@
             //获取精华帖
             handleGetGoodKnlgeShares({current=this.current,pageSize=this.pageSize}={}){
                 getGoodKnlgeShares({current,pageSize}).then(response=>{
-                    console.log()
                     this.goodKnlgeShares = response.value.map(item => {
                               item.id = (Long.fromValue(item.id)).toString()
                               return item 
-                            })
+                        })
                 })
             },
             //分页获取所有的文章列表
            async handleGetKnlgeShares({current=this.current,pageSize=this.pageSize}={}){
                await this.handleGetGoodKnlgeShares()
+              
                 getKnlgeShares({current,pageSize}).then(response=>{
                         this.isLoading = true
                         this.isMyKnow = false;//游客
                         this.isSearchData = false
-
-
                         let page = response.page    
                         this.total  = page.total + (this.goodKnlgeShares.length)
                         this.documentList = response.value.map(item => {
@@ -193,8 +191,7 @@
             },
          
         },
-        async mounted () {
-            await this.handleGetGoodKnlgeShares()
+        mounted () {
               this.handleGetKnlgeShares()
         }
     }

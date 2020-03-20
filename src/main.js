@@ -13,6 +13,7 @@ import App from './App'
 import store from './store'
 import router from './router'
 import './permission'
+import '@/icons' // icon
 
 import plugin from './utils/bus';
 Vue.use(plugin)
