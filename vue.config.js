@@ -21,7 +21,7 @@ module.exports = {
   devServer: {
     port: port,
     open: true,
-    /* host:'192.168.8.247', */
+   /*  host:'192.168.43.12', */
     overlay: {
       warnings: false,
       errors: true
@@ -46,8 +46,6 @@ module.exports = {
     }
   },
   configureWebpack: {
-    // provide the app's title in webpack's name field, so that
-    // it can be accessed in index.html to inject the correct title.
     name: name,
     resolve: {
       alias: {
@@ -58,11 +56,7 @@ module.exports = {
   chainWebpack(config) {
     config.plugins.delete('preload') // TODO: need test
     config.plugins.delete('prefetch') // TODO: need test
-    /*  config.optimization.minimize(true)
-     config.optimization.splitChunks({
-       chunks:'all'
-     }) */
-    // set svg-sprite-loader
+  
     config.module
       .rule('svg')
       .exclude.add(resolve('src/icons'))

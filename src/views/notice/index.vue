@@ -1,3 +1,11 @@
+<!--
+ * @Author: your name
+ * @Date: 2020-02-23 18:16:10
+ * @LastEditTime: 2020-03-20 17:46:55
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: \portalSite_UI_vue\src\views\notice\index.vue
+ -->
 <template>
     <div >
         <notice-title :title="title"  english="Top Notices" :isSearch="false" routeSkip="notice-trends" ></notice-title>
@@ -17,6 +25,7 @@ import NoticeTitle from '@/components/title'
 import { getNoticeList } from '@/api/notice'
 import Loading from '@/components/loading'
 import NoData from '@/components/noData'
+import Long from "long"
 export default {
     components:{
         NoticeTitle,
@@ -43,7 +52,7 @@ export default {
                      if(response.value && response.value.length >0){
                          this.isNoData = true
                         response.value.map(item => {
-                        item.id = BigInt(item.id)
+                        item.id = (Long.fromValue(item.id)).toString()
                           })
                          this.noticeData = response.value
                      }

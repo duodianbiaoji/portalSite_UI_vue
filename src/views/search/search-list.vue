@@ -1,16 +1,16 @@
 <!--
  * @Author: your name
  * @Date: 2020-02-23 18:16:10
- * @LastEditTime: 2020-03-19 09:48:47
+ * @LastEditTime: 2020-03-22 16:47:11
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\views\search\search-list.vue
  -->
 <template>
     <div  class="search" >
-        <search-menu  :search-articles="handleSearchSingle"  :information-category="informationCategory" ></search-menu>
+        <search-menu  @searchArticles="handleSearchSingle"  :information-category="informationCategory" ></search-menu>
         <div class="search-content">
-            <search-title :get-all-data="handleSearchSingle"  @emitSearch="onSearchSingle" :title="title" english="Search Result" :ismany="false" ></search-title>
+            <search-title :get-all-data="handleSearchArticles"  @emitSearch="onSearchSingle" :title="title" english="Search Result" :ismany="false" ></search-title>
             <item v-for="(item,index) in infoDataList" :searchInfo="item" :key="index" ></item> 
 
            <el-pagination
@@ -37,7 +37,7 @@ import {searchArticles} from "@/api/home"
 export default {
     data(){
         return {
-            pageSize:10,
+            pageSize:8,
             current:1,
             total:0,
             pageSizes:[8,16,32],
@@ -48,6 +48,7 @@ export default {
             informationCategory:null,//信息类别统计
             infoDataList:[],
             fastsearchSingle:"",
+            articletype:"-1"
 
         }
     },
@@ -69,6 +70,7 @@ export default {
         },
         //导航全局搜索
         handleSearchArticles({current=this.current,pageSize=this.pageSize,articletype=-1,fastsearch=this.fastsearch}={}){  
+          
             const data = {
                 current,
                 pageSize,
@@ -84,7 +86,7 @@ export default {
             })
         },
         //局部搜索
-        handleSearchSingle({current=this.current,pageSize=this.pageSize,articletype=-1,fastsearch=this.fastsearchSingle}={}){
+        handleSearchSingle({current=this.current,pageSize=this.pageSize,articletype = this.articletype,fastsearch=this.fastsearchSingle}={}){
         
             const data = {
                 current,
@@ -92,17 +94,18 @@ export default {
                 articletype,
                 fastsearch
             }
-            this.articletype = articletype
-          
+             this.articletype = articletype
+             
             searchArticles(data).then(response => {
                 this.total = response.articles.page.total
                 this.infoDataList = response.articles.value
-                console.log(response)
+                
             })
         },
         //接收局部搜索的值
         onSearchSingle(value){
             this.fastsearchSingle = value
+            this.handleSearchSingle()
         }
     },
     computed: {
@@ -114,9 +117,6 @@ export default {
         fastsearch(){
             this.handleSearchArticles()
         },
-        fastsearchSingle(){
-            this.handleSearchSingle()
-        }
     },
     mounted () {
         this.handleSearchArticles()

@@ -10,11 +10,14 @@
     <div style="margin: 100px 18% 40px 18%;position: relative;" >
                 <train-title :get-all-data="handleGetOrgTrains" @emitSearch="onSearchSingle" :title="title" english="Training Center" :ismany="false" ></train-title>      
                          <div style="background: #fff;padding: 20px;" >
-
-                            <div v-if="isLoading&&!isSearchData"  style="line-height: 20px" v-for="(item,index) in documentList" :key="index" >
-                                    <items :row="item" :index="index" ></items>
+                            <div v-if="isLoading&&!isSearchData">
+                                <list-title></list-title>
+                                <div   style="line-height: 20px" v-for="(item,index) in documentList" :key="index" >
+                                    <item :row="item" :index="index" goRouteName="train-details" :paramObject="{articleid:item.id}" ></item>
+                               </div>
                             </div>
                             <search-item v-if="isSearchData" v-for="(item,index) in documentList"  :search-info="item" :key="index" ></search-item>
+                            
                             <div v-if="!isLoading" style="min-height: 500px;position: relative;" >
                                 <loading></loading>
                             </div>
@@ -40,7 +43,7 @@
 </template>
 
 <script>
-import Items from './Items'
+import Item  from "@/views/components/listData/item"
 import TrainTitle from '@/components/title'
 import { getOrgTrains } from "@/api/train"
 import Long from "long"
@@ -48,13 +51,15 @@ import Loading from "@/components/loading"
 import NoData from '@/components/noData'
 import {searchArticles} from "@/api/home"
 import SearchItem from "@/components/search"
+import ListTitle  from "@/views/components/listData/title"
 export default {
     components:{
         TrainTitle,
-        Items,
+        Item,
         Loading,
         NoData,
-        SearchItem
+        SearchItem,
+        ListTitle
     },
     data(){
         return {
@@ -77,12 +82,21 @@ export default {
         // pagesize 变化回调
         handleSizeChange(val){
             this.pageSize = val
-            this.handleGetOrgTrains()
+            if(this.isSearchData){
+                this.handleSearch()
+            }else{
+                this.handleGetOrgTrains()
+            }
+           
         },
        //current 变化回调
         handleCurrentChange(val){
             this.current = val
-            this.handleGetOrgTrains()
+            if(this.isSearchData){
+                this.handleSearch()
+            }else{
+                this.handleGetOrgTrains()
+            }
         },
         //分页获取培训数据
         handleGetOrgTrains({current=this.current,pageSize=this.pageSize}={}){

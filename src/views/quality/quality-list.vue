@@ -54,10 +54,10 @@ import SearchItem from "@/components/search"
         },
         data(){
             return{
-                pageSize:1,
+                pageSize:10,
                 current:1,
                 total:0,
-                pageSizes:[1,20,30,40],
+                pageSizes:[10,20,30,40],
                 title:{
                     nameLeft:"质量",
                     nameRight:"信息"

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-03-02 17:41:06
- * @LastEditTime: 2020-03-11 17:14:04
+ * @LastEditTime: 2020-03-20 14:32:56
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\views\knowledge-sharing\release\index.vue
@@ -34,6 +34,7 @@
                       :before-remove="beforeRemoveFiles"
                       :action="actionApi"
                       :on-error="handleUploadFileError"
+                      :file-list="knowledgeObject.annexes"
                     >
                       <div class="eladmin-upload"><i class="el-icon-upload" /> 添加文件</div>
                       <div slot="tip" class="el-upload__tip">可上传任意格式文件，且不超过100M</div>
@@ -62,7 +63,7 @@ import Long from 'long'
                 knowledgeObject:{
                     title:null,
                     content:"",
-                    annexes:""
+                    annexes:[]
                 },
                 knowledgeRules:{
                     title:[
@@ -78,6 +79,7 @@ import Long from 'long'
                 isExistTitle:null,
                 knowledgeDetail:null,//单个分享详情
                 firstTitle:null,
+        
             }
         },
         computed: {
@@ -126,8 +128,17 @@ import Long from 'long'
               }
               getKnlgeShareDetail(data).then(response=>{
                   if(response !== undefined && response){
+                      response.annexes = response.annexes.map(item=>{
+                          item.fid = (Long.fromValue(item.fid)).toString()
+                          return item
+                      })
                       this.knowledgeObject = {title:response.title,content:response.content,annexes:response.annexes}
+
+                      console.log(this.knowledgeObject.annexes)
                       this.firstTitle = response.title
+
+                      this.fileList = this.knowledgeObject.annexes
+                      
                     }
               })
           },
@@ -149,6 +160,7 @@ import Long from 'long'
           },
           //删除文件之前
         beforeRemoveFiles(file,filelist){
+            
               this.fileList.forEach((item,index) =>{
                   if(item.name === file.name){
                     fileDelete(item).then(response=>{
@@ -214,7 +226,7 @@ import Long from 'long'
                 if(valid){
                 
                     this.knowledgeObject.annexes = this.fileList
-
+                   
                     const data = {
                          id:this.updateId,
                          ...this.knowledgeObject
@@ -249,7 +261,8 @@ import Long from 'long'
                 type:'error',
                 duration:2500
             })
-        }
+        },
+       
         },
         components:{
             Breadcrumd,

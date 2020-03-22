@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-02-23 18:16:10
- * @LastEditTime: 2020-03-20 09:31:14
+ * @LastEditTime: 2020-03-20 17:45:18
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\views\news\news-details.vue
@@ -18,7 +18,8 @@
                         <span style="position: absolute;bottom: 25%;left:20%;transform: translateX(-20%); color: #ffffff;    font-weight: 700;
                         font-size: 20px;
                         line-height: 26px;
-                        font-family: cursive;" >
+                        font-family: cursive;">
+                        {{activeInfo.summary}}
                         </span>
                             
                 </div>

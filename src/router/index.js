@@ -156,20 +156,7 @@ export const constantRouter = [
             }
         ]
     },
-    /* {
-        path:'/project',
-        component:Layout,
-        redirect:'/project/index',
-        name:'project',
-        children:[
-            {
-            path:'project-list',
-            name:'project-list',
-            component:()=>import('@/views/project/index'),
-            meta:{title:'项目进度'}
-            }
-        ]
-    }, */
+   
     {
         path:'/knowledge-sharing',
         component:Layout,

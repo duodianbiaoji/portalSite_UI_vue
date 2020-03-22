@@ -82,6 +82,7 @@ export default {
         },
         onSearchSingle(val){
             this.fastsearch = val
+            this.handleSearch()
         },
 
         
@@ -115,11 +116,7 @@ export default {
         Loading,
         SearchItem
     },
-    watch: {
-        fastsearch(){
-            this.handleSearch()
-        }
-    },
+   
     mounted(){
         this.handleGetHonour()
     }

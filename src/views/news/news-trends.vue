@@ -7,9 +7,16 @@
         </el-carousel>
           <div style="margin: 18px 18%;background-color: #fff;padding: 20px;" >
             <news-title :get-all-data="handleGetNewList" @emitSearch="onSearchSingle" :title="title" english="New Information" :ismany="false" :callback="handleSearch" ></news-title>
-            <div v-if="isloading&&!isSearchData">
-                <item v-for="(news,index) in newsData" :row="news" :index="index" :key="index"   ></item>
-                
+            <div v-if="isloading&&!isSearchData" v-for="(news,index) in newsData">
+               <!--  <item :row="news" :index="index" :key="index"   ></item> -->
+                <item :row="news" :index="index" goRouteName="news-show" :paramObject="{newsid:news.id}" >
+                    <template  #default="slotProps">
+                       
+                            {{slotProps.row.newsTName}}
+                   
+                        
+                    </template>
+                </item>
             </div>
             <search-item v-if="isSearchData" v-for="(item,index) in newsData"  :search-info="item" :key="index" ></search-item>
             <div v-if="!isloading" style="min-height: 400px; position: relative;">
@@ -35,7 +42,7 @@
     </div>
 </template>
 <script>
-import Item from './Item'
+import Item from "@/views/components/listData/item"
 import NewsTitle from '@/components/title'
 import Breadcrumd from '@/components/breadcrumd.vue'
 import { getNewList } from '@/api/news'

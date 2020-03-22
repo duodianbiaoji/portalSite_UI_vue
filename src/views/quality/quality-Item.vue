@@ -8,16 +8,18 @@
  -->
 <template>
     <div style="width:100%" > 
-        <item v-for="(quality,index) in qualityData" :key="index" :row="quality" :index="index" ></item>
+        <list-title></list-title>
+        <item v-for="(quality,index) in qualityData"  goRouteName="quality-details" :paramObject="{articleid:quality.id}" :key="index" :row="quality" :index="index" ></item>
     </div>
 </template>
 <script>
-import Item from './Item'
-
+import Item  from "@/views/components/listData/item"
+import ListTitle  from "@/views/components/listData/title"
 export default {
     name:'QualityItem',
     components:{
         Item,
+        ListTitle
     },
     props:{
         qualityData:{

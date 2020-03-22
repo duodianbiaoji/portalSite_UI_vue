@@ -5,17 +5,19 @@
                  <!--头部标题-->
                     <institution-title :get-all-data="handleGetRegulations"  @emitSearch="onSearchSingle" :title="title" english="System Document" :ismany="false"  ></institution-title>
 
-
+                   <!--分页数据-->
                     <div v-if="isLoading&&!isSearchData"  style="line-height: 20px">
-                         <items  v-for="(item,index) in documentList" :key="index"  :row="item" :index="index" ></items>
+                         <list-title></list-title>
+                         <item v-for="(item,index) in documentList" :row="item" goRouteName="institution-details" :paramObject="{articleid:item.id}" :key="index" :index="index" ></item>
                     </div>
                    
-
+                    <!--搜索数据-->
                     <search-item v-if="isSearchData" v-for="(item,index) in documentList"  :search-info="item" :key="index" ></search-item>
+                    <!--加载-->
                     <div v-if="!isLoading" style="min-height: 500px;position: relative;" >
                         <loading></loading>
                      </div>
-                    
+                    <!--无数据-->
                     <div v-if="!isNoData&&isLoading" style="min-height: 500px;position: relative;">
                        <no-data></no-data>
                     </div>
@@ -40,21 +42,23 @@
 <script>
 import InstitutionTitle from '@/components/title'
 import SidebarMenu from './sidebar-menu'
-import Items from './Items'
 import { getRegulations } from "@/api/institution"
 import Long from "long"
 import Loading from "@/components/loading"
 import NoData from '@/components/noData'
 import {searchArticles} from "@/api/home"
 import SearchItem from "@/components/search"
+import Item  from "@/views/components/listData/item"
+import ListTitle  from "@/views/components/listData/title"
     export default {
         components:{
             InstitutionTitle,
             SidebarMenu,
-            Items,
             Loading,
             NoData,
-            SearchItem
+            SearchItem,
+            Item,
+            ListTitle
            
         },
         data(){
@@ -111,6 +115,7 @@ import SearchItem from "@/components/search"
             
             onSearchSingle(val){
                this.fastsearch = val
+               this.handleSearch()
              },
 
         
@@ -139,11 +144,7 @@ import SearchItem from "@/components/search"
         mounted () {
                 this.handleGetRegulations()
         },
-        watch: {
-          fastsearch(){
-              this.handleSearch()
-           }
-         },
+       
     }
     </script>
     <style lang="scss" scoped >

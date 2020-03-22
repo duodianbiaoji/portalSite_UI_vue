@@ -30,6 +30,7 @@ export default {
     methods: {
         //获取分页列表
         handleGetQualitys({current=this.current,pageSize=this.pageSize}={}){
+
             getQualitys({current,pageSize}).then(response => {
                 this.isLoading = true
                 if(response.value.length > 0){
@@ -44,7 +45,7 @@ export default {
         }
     },
     mounted(){
-        this.handleGetQualitys(1,6);
+        this.handleGetQualitys({current:1,pageSize:6});
         
     },
     data(){

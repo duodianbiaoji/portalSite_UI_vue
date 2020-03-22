@@ -7,9 +7,26 @@
                         <!-- <el-button class="all-knowledge" type="primary" @click="handleGetKnlgeShares">所有文章<i class="el-icon-video-play"></i></el-button> -->
                         <el-button class="my-knowledge" type="primary" @click="handleMyKnowledge">我的文章<i class="el-icon-video-play"></i></el-button>
                         <el-button class="gorelease-button" type="primary" @click="goRelease">分享我的经验<i class="el-icon-video-play"></i></el-button>
+                        
+                        <div v-if="isLoading&&!isSearchData&&isMyKnow"  style="line-height: 20px" v-for="(item,index) in documentList" :key="index" >
+                            <items :row="item" :isMyKnow="isMyKnow" :getMyKnowledge="handleMyKnowledge"  ></items>
+                        </div>
+
+                        <el-tabs v-if="!isMyKnow" v-model="activeName" @tab-click="handleClick">
+                            
+                            <el-tab-pane label="所有文章" name="all">
                                 <div v-if="isLoading&&!isSearchData"  style="line-height: 20px" v-for="(item,index) in documentList" :key="index" >
-                                        <items :row="item" :isMyKnow="isMyKnow" :getMyKnowledge="handleMyKnowledge"  ></items>
+                                    <items :row="item" :isMyKnow="isMyKnow"   ></items>
                                 </div>
+                            </el-tab-pane>
+                            <el-tab-pane label="精选文章" name="good">
+                                <div v-if="isLoading&&!isSearchData"  style="line-height: 20px" v-for="(item,index) in documentList" :key="index" >
+                                    <items :row="item" :isMyKnow="isMyKnow"  ></items>
+                                 </div>
+                            </el-tab-pane>
+                       </el-tabs>
+
+                            
 
                                 <search-item v-if="isSearchData" v-for="(item,index) in documentList"  :search-info="item" :key="index" ></search-item>
                                 
@@ -75,21 +92,37 @@
                 isNoData:false,
                 fastsearch:null,//搜索参数
                 isSearchData:false,//是否搜索数据
+                activeName:"all"
             }
         },
-        watch: {
-            fastsearch(){
-              this.handleSearch()
-           }
-        },
+        
         methods:{
             // pagesize 变化回调
             handleSizeChange(val){
-    
+               this.pageSize = val
+               if(this.activeName === "good"){
+                   this.handleGetGoodKnlgeShares()
+               }else if(this.activeName === "all"){
+                   this.handleGetKnlgeShares()
+               }
+
+               if(this.isSearchData){
+                this.handleGetKnlgeShares()
+               }
             },
            //current 变化回调
             handleCurrentChange(val){
-    
+                this.current = val
+                if(this.activeName === "good"){
+                   this.handleGetGoodKnlgeShares()
+               }else if(this.activeName === "all"){
+                   this.handleGetKnlgeShares()
+               }
+
+               
+               if(this.isSearchData){
+                this.handleGetKnlgeShares()
+               }
             },
             //去发布界面 
             goRelease(){
@@ -105,40 +138,58 @@
             },
             //获取精华帖
             handleGetGoodKnlgeShares({current=this.current,pageSize=this.pageSize}={}){
+                        this.isLoading = true
+                        this.isMyKnow = false;//游客
+                        this.isSearchData = false
                 getGoodKnlgeShares({current,pageSize}).then(response=>{
-                    this.goodKnlgeShares = response.value.map(item => {
+                    this.total = response.page.total
+                    this.documentList = response.value.map(item => {
                               item.id = (Long.fromValue(item.id)).toString()
                               return item 
                         })
+                        if( this.documentList.length > 0){
+                            this.isNoData = true
+                        }
                 })
             },
             //分页获取所有的文章列表
-           async handleGetKnlgeShares({current=this.current,pageSize=this.pageSize}={}){
-               await this.handleGetGoodKnlgeShares()
-              
+            handleGetKnlgeShares({current=this.current,pageSize=this.pageSize}={}){
+                
                 getKnlgeShares({current,pageSize}).then(response=>{
                         this.isLoading = true
                         this.isMyKnow = false;//游客
                         this.isSearchData = false
+                        this.activeName = "all"
                         let page = response.page    
-                        this.total  = page.total + (this.goodKnlgeShares.length)
+                        this.total  = page.total
+                       
                         this.documentList = response.value.map(item => {
                               item.id = (Long.fromValue(item.id)).toString()
                               return item 
                             })
-                        this.documentList=[...this.goodKnlgeShares,...this.documentList]
                         if( this.documentList.length > 0){
                             this.isNoData = true
                         }
+                        
                 
                 })
             },
-            
+            handleClick(tab){
+             
+                if(tab.name === "all"){
+                    this.handleGetKnlgeShares()
+                }
+                if(tab.name === "good"){
+                    this.handleGetGoodKnlgeShares()
+                }
+            },
+            //监听接收的搜索数据
             onSearchSingle(val){
                this.fastsearch = val
+               this.handleSearch()
              },
-        //搜索数据 
-         handleSearch({current=this.current,pageSize=this.pageSize,articletype=6,fastsearch=this.fastsearch}={}){
+           //搜索数据 
+           handleSearch({current=this.current,pageSize=this.pageSize,articletype=6,fastsearch=this.fastsearch}={}){
            //状态初始化
             this.isLoading = false
             this.isNoData = false

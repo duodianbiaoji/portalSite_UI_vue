@@ -24,7 +24,7 @@ export default {
 
             rowBottom:[
             {
-                    linkTo:{name:'project-list'},
+                    linkTo:{name:'train-list'},
                     colClass:['module-project-content'],
                     colConClass:['module-item'],
                     colImgSrc: require('@/assets/images/培训专栏.png'),

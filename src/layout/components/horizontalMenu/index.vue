@@ -43,10 +43,10 @@
      <div v-show="loginStatue" style="margin-left: 10px;">
       <el-dropdown @command="handleCommand" trigger="click">
         <span class="el-dropdown-link">
-             {{user_name}}<i class="el-icon-arrow-down el-icon--right"></i>
+             {{user_avatar}}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="a">个人信息</el-dropdown-item>
+         <!--  <el-dropdown-item command="a">个人信息</el-dropdown-item> -->
           <el-dropdown-item command="b">退出</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -82,7 +82,8 @@ export default {
     computed: {
       ...mapGetters([
          'permission_routes',
-         'user_name'
+         'user_name',
+         'user_avatar'
        ]),
         activeMenu(){
           const route = this.$route

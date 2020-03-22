@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import {mapGetters} from "vuex"
 export default {
     data(){
         return {
@@ -56,6 +57,11 @@ export default {
             },
             subloading:false,//登录状态
         }
+    },
+    computed: {
+        ...mapGetters([
+            'user_avatar'
+        ])
     },
     methods:{
         handleShowDialog(){
@@ -85,12 +91,12 @@ export default {
                         this.subloading = false;
                         this.dialogVisible = false;
                         this.$message({
-                            message:'欢迎您登录',
+                            message:`欢迎${this.user_avatar}上线`,
                             type:'success'
                         })
                     }).catch(error=>{
                         this.subloading = false;
-                        this.$message.error(`${error}`)
+                       
                     })
                 }
             })

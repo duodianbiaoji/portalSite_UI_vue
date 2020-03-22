@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-02-23 18:16:10
- * @LastEditTime: 2020-03-11 17:17:18
+ * @LastEditTime: 2020-03-21 09:30:06
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\views\knowledge-sharing\Items.vue
@@ -10,8 +10,8 @@
         <div v-if="row" >
                
                          <div v-if="!isMyKnow" style="display: flex;justify-content: space-between;flex-wrap: nowrap;margin: 20px 0px;font-size: 14px;cursor: pointer;" >
-                                <div  style="width: 10%;color: #146499;font-weight: 600;">
-                                        <span v-if="row.type">精选</span>
+                                <div v-if="row.type" style="width: 10%;color: #146499;font-weight: 600;">
+                                        <span>精选</span>
                                 </div>
                                 <router-link :to="{name:'knowledge-details',params:{articleid:row.id}}" style="text-decoration: none;width: 50%;" >
                                 <div style="width: 100%;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;color: #535151;" >

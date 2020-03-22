@@ -1,5 +1,13 @@
 <template>
-    <div ref="editor" class="text" ></div>
+    <div>
+        <div id="div1" class="toolbar">
+        </div>
+        <div style="padding: 5px 0; color: #ccc"></div>
+        <div id="div2" class="text"> <!--可使用 min-height 实现编辑区域自动增加高度-->
+            <p>请输入正文......</p>
+        </div>
+    </div>
+  
 </template>
 
 <script>
@@ -20,7 +28,7 @@ export default {
         }
     },
     mounted () {
-        this.editor = new Editor(this.$refs.editor)
+        this.editor = new Editor('#div1', '#div2')
        
          // 自定义菜单配置
          this.editor.customConfig.zIndex = 10
@@ -62,8 +70,16 @@ export default {
       width: 100%;
       text-align: left;
       margin-left: 160px;
+      min-height:600px;
+      border: 1px solid #ccc;
     }
    .w-e-text-container {
       height: 200px !important;
+    }
+    .toolbar {
+        width: 100%;
+        text-align: left;
+        margin-left: 160px;
+        border: 1px solid #ccc;
     }
 </style>

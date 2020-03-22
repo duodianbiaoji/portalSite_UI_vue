@@ -20,7 +20,6 @@ export function setName(name){
 }
 
 export function getName(){
-    console.log(Config.userName)
     return Cookies.get(Config.userName)
 }
 export function removeName(){

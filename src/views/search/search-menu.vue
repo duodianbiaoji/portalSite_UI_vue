@@ -10,7 +10,7 @@
         <div>
             <dl class="list nigiri" style="transform: perspective(1200px);font-size: 14px;font-weight: 600;" >
                    <!-- <el-badge v-for="(item,index) in informationCategory" :max="99" :key="index" :value="item.count" class="item" > -->
-                     <span v-for="(item,index) in informationCategory" :key="index" @click="searchArticles({articletype:item.articletype})">
+                     <span v-for="(item,index) in informationCategory" :key="index" @click="handleSearch({articletype:item.articletype})">
                          <dd>{{item.articletypeStr}}<span>({{item.count}})</span></dd>
                     </span>
                   <!-- </el-badge> -->
@@ -28,9 +28,11 @@
             informationCategory:{ //信息类别
                 type:Array,
                 default:[]
-            },
-            searchArticles:{  //检索方法
-                type:Function
+            }
+        },
+        methods: {
+            handleSearch(val){
+                this.$emit("searchArticles",val)
             }
         }
     }

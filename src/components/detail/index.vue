@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-03-15 22:01:20
- * @LastEditTime: 2020-03-20 11:11:29
+ * @LastEditTime: 2020-03-22 16:51:45
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\components\detail\index.vue
@@ -13,8 +13,8 @@
         </div>
         <div style="text-align: center;" >
             <span>{{detailsData.publishdate}}</span>
-            <span style="margin-left: 20px">发布人:{{detailsData.author}}</span>
-            <span style="margin-left: 20px" >浏览量:{{detailsData.pageview}}</span>
+            <span style="margin-left: 20px"><svg-icon icon-class="people" class-name="from-like" ></svg-icon>{{detailsData.author}}</span>
+            <span style="margin-left: 20px" ><svg-icon icon-class="eyeball" class-name="from-like" ></svg-icon>{{detailsData.pageview}}</span>
         </div>
         <div style="width: 100%;height: 100%;background: #fff;overflow: hidden;border-top: 1px solid #666;" >
             <span v-html="detailsData.content" ></span>
@@ -38,6 +38,15 @@
                     </div>
                 </div>
          </div>
+
+         <div style="display: flex;flex-direction:column;cursor: pointer;width: 100%;border-top: #dbd8d8 solid;padding: 10px;">
+             <div style="margin-bottom: 16px;" @click="handleGetKnlgeShareDetail({detailId:frontId})">
+                 <span>上一条:<span>{{frontName}}</span></span>
+             </div>
+             <div  @click="handleGetKnlgeShareDetail({detailId:nextId})">
+                <span>下一条:{{nextName}}</span>
+            </div>
+         </div>
         
     </div>
 </template>
@@ -52,6 +61,10 @@ import Share from "@/components/detail/share"
                 detailsData:null,
                 isLoading:false,
                 isFile:false,
+                frontId:0,
+                nextId:0,
+                frontName:"",
+                nextName:"",
             }
         },
         watch: {
@@ -84,27 +97,45 @@ import Share from "@/components/detail/share"
         },
         methods:{
             //获取分享详情
-            handleGetKnlgeShareDetail(){
+            handleGetKnlgeShareDetail({detailId=this.detailId}={}){
+            this.isFile = false
             let detailName = this.detailName
             const data = {}
             if(this.detailType !== undefined && this.detailType !== null){
                 data["type"] = this.detailType
             }
              
-              data[detailName] = this.detailId
+              data[detailName] = detailId
              
               this.getDetail(data).then(response=>{
                   if(response !== undefined && response){
                        this.isLoading = true
-                      
+                    
                        if(response.annexes.length > 0){
                            this.isFile = true
+                           console.log(this.isFile)
                            response.annexes = response.annexes.map(item =>{
                             item.fid = (Long.fromValue(item.fid)).toString()
                             return item
                           })
                         }
                        this.detailsData = response
+                      if(this.detailsData.next !== null){
+                        let nextArr = this.detailsData.next.split("|")
+                        this.nextId = nextArr[0]
+                        this.nextName = nextArr[1]
+                      }else{
+                        this.nextName = ""
+                      }
+                      if(this.detailsData.front !== null){
+                        let frontArr = this.detailsData.front.split("|")
+                        this.frontId = frontArr[0]
+                        this.frontName = frontArr[1]
+                      }else{
+                        this.frontName = ""
+                      }
+                      
+
                       
                     }
               })
@@ -125,3 +156,9 @@ import Share from "@/components/detail/share"
         }
     }
     </script>
+
+<style scoped>
+.from-like {
+    font-size: 16px;
+}
+</style>

@@ -13,6 +13,7 @@ export function fileDelete(picture) {
     url: 'files/delete',
     method: 'post',
     data: {
+        fid: picture.fid,
         path: picture.path,
         name: picture.name
     }

@@ -4,7 +4,7 @@ import router,{resetRouter} from '@/router'
 const state = {
     token:getToken(),
     name:getName(),
-    avatar:'',
+    avatar:getName(),
     roles:[],
     loginStatus:getLoginStatue() || false,
 }
@@ -38,7 +38,7 @@ const actions = {
                 commit('SET_AVATAR',respone.realname)
                 commit('SET_LOGIN_STATUE',true)
                 setLoginStatue(true)
-                setName(respone.username)
+                setName(respone.realname)
                 resolve()
             }).catch(error=>{
                 reject(error)
