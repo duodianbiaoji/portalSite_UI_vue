@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-// import Long from 'long'
+import Long from 'long'
 
 export function fileUpload(data) {
   return request({
@@ -17,6 +17,17 @@ export function fileDelete(picture) {
   }
   return request({
     url: 'files/delete',
+    method: 'post',
+    data: data
+  })
+}
+
+export function fileDownload(file) {
+  const data = {
+    fid: (Long.fromValue(file.fid)).toString()
+  }
+  return request({
+    url: 'files/download',
     method: 'post',
     data: data
   })

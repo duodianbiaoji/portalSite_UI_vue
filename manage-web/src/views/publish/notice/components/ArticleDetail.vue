@@ -20,19 +20,19 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="通告内容" prop="contentStr">
-        <Editor v-model="form.contentStr" :is-clear="isClear" @change="getEditorContent" />
+      <el-form-item label="通告内容" prop="content">
+        <Editor v-model="form.content" :is-clear="isClear" @change="getEditorContent" />
       </el-form-item>
       <el-form-item label="上传附件" prop="annexes">
         <el-upload
           ref="upload"
-          v-model="form.annexes"
           multiple
           :headers="headers"
           :http-request="httpRequestFile"
           :before-remove="handleBeforeRemoveFile"
           :on-success="handleSuccessFile"
           :on-error="handleErrorFile"
+          :file-list="uploadFileList"
           :action="imagesUploadApi"
         >
           <div class="eladmin-upload"><i class="el-icon-upload" /> 添加文件</div>
@@ -59,7 +59,7 @@ import CRUD, { presenter, header, crud } from '@crud/crud'
 import Editor from '@/views/components/Editor'
 
 // crud交由presenter持有
-const defaultCrud = CRUD({ requestType: 'post', url: 'news/getPublishNews', crudMethod: { ...crudNoticesPublish }})
+const defaultCrud = CRUD({ requestType: 'post', url: 'notice/getReviewRecords', query: { status: '0' }, crudMethod: { ...crudNoticesPublish }})
 export default {
   name: 'Pictures',
   components: { Editor },
@@ -76,7 +76,7 @@ export default {
         id: null,
         title: null,
         ntid: null,
-        contentStr: null,
+        content: null,
         annexes: []
       },
       submitLoading: false,
@@ -100,6 +100,7 @@ export default {
       pictureResult: {},
       fileList: [],
       pictureList: [],
+      uploadFileList: [],
       isClear: false
     }
   },
@@ -130,18 +131,19 @@ export default {
     },
     getNoticesContent(row) {
       getNoticesContent((Long.fromValue(row.id)).toString()).then(res => {
-        this.form.contentStr = res.contentStr
+        this.form.content = res.content
+        this.uploadFileList = res.annexes
       })
     },
     getEditorContent(data) {
-      this.form.contentStr = data
+      this.form.content = data
     },
     resetForm() {
       this.form = {
         id: null,
         title: null,
         ntid: null,
-        contentStr: null,
+        content: null,
         annexes: []
       }
     },
@@ -157,7 +159,7 @@ export default {
               })
               this.submitLoading = false
               return false
-            } else if (!this.form.contentStr) {
+            } else if (!this.form.content) {
               this.$message({
                 message: '通告内容不能为空',
                 type: 'warning'
@@ -195,7 +197,7 @@ export default {
               })
               this.submitLoading = false
               return false
-            } else if (!this.form.contentStr) {
+            } else if (!this.form.content) {
               this.$message({
                 message: '通告内容不能为空',
                 type: 'warning'

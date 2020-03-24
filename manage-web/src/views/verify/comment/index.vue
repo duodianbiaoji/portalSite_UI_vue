@@ -2,6 +2,27 @@
   <div class="app-container">
     <!--工具栏-->
     <crudOperation />
+    <div style="float: right;margin: -23px 20px 0 0;">
+      <el-select
+        v-model="query.status"
+        size="mini"
+        placeholder="状态"
+        class="filter-item"
+        style="width:85px;"
+        @change="crud.toQuery"
+      >
+        <el-option
+          v-for="item in enabledTypeOptions"
+          :key="item.key"
+          :label="item.display_name"
+          :value="item.key"
+        />
+      </el-select>
+      <span>
+        <el-button class="filter-item" style="padding: 5px;" size="mini" type="success" icon="el-icon-search" @click="crud.toQuery">搜索</el-button>
+        <el-button style="margin-left: 5px;padding: 5px;" class="filter-item" size="mini" type="warning" icon="el-icon-refresh-left" @click="crud.resetQuery()">重置</el-button>
+      </span>
+    </div>
     <!--表格渲染-->
     <el-table
       v-loading="crud.loading"
@@ -22,8 +43,8 @@
         align="center"
       >
         <template slot-scope="scope">
-          <el-button type="warning" size="mini" @click="handleClick(scope.row)">审核</el-button>
-          <el-button type="primary" size="mini" @click="handleClickDetail(scope.row)">详情</el-button>
+          <el-button type="warning" style="padding: 6px;" size="mini" @click="handleClick(scope.row)">审核</el-button>
+          <el-button type="primary" style="padding: 6px;" size="mini" @click="handleClickDetail(scope.row)">详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -36,11 +57,11 @@
       width="420px"
       @close="cancelCU"
     >
-      <el-form ref="form" :inline="true" :model="form" :rules="rules" size="small" label-width="110px">
-        <el-form-item label="审核意见" prop="reviewComment">
+      <el-form ref="form" :inline="true" :model="form" size="small" label-width="110px">
+        <el-form-item label="审核意见">
           <el-input v-model="form.reviewComment" style="width: 185px;" rows="2" type="textarea" />
         </el-form-item>
-        <el-form-item label="是否通过" prop="reviewstatus">
+        <el-form-item label="是否通过">
           <el-radio-group v-model="form.reviewstatus" @change="changeRadio">
             <el-radio :label="1" style="margin-left: 23px;">通过</el-radio>
             <el-radio :label="0" style="margin-left: -12px;">不通过</el-radio>
@@ -92,7 +113,7 @@ import crudOperation from '@crud/CRUD.operation'
 import pagination from '@crud/Pagination'
 
 // crud交由presenter持有
-const defaultCrud = CRUD({ requestType: 'post', url: 'comment/getNoPassComments', crudMethod: { ...crudComment }})
+const defaultCrud = CRUD({ requestType: 'post', url: 'comment/getReviewRecords', query: { status: '0' }, crudMethod: { ...crudComment }})
 export default {
   name: 'NewsVerify',
   components: { crudOperation, pagination },
@@ -106,14 +127,13 @@ export default {
         reviewstatus: 1
       },
       selectRowId: undefined,
-      rules: {
-        reviewComment: [
-          { required: true, message: '请输入审核意见', trigger: 'blur' }
-        ]
-      },
       showdetail: false,
       detail: {},
-      detailsList: {}
+      detailsList: {},
+      enabledTypeOptions: [
+        { key: '0', display_name: '未通过' },
+        { key: '1', display_name: '已通过' }
+      ]
     }
   },
   computed: {
@@ -151,20 +171,28 @@ export default {
     changeRadio(val) {
       this.form.reviewstatus = val
     },
-    verifySubmit() {
-      this.$refs.form.validate(valid => {
-        if (valid) {
-          this.verifyLoading = true
-          reviewComment(this.selectRowId, this.form).then(res => {
-            this.verifyLoading = false
-            this.verifyDialog = false
-            this.crud.refresh()
-          })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
+    requestData() {
+      this.verifyLoading = true
+      reviewComment(this.selectRowId, this.form).then(res => {
+        this.verifyLoading = false
+        this.verifyDialog = false
+        this.crud.refresh()
       })
+    },
+    verifySubmit() {
+      if (this.form.reviewstatus === 0) {
+        if (this.form.reviewComment === null) {
+          this.$message({
+            type: 'warning',
+            message: '评论意见不能为空!'
+          })
+          return false
+        } else {
+          this.requestData()
+        }
+      } else {
+        this.requestData()
+      }
     }
   }
 }

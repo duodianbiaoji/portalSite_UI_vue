@@ -2,27 +2,25 @@
   <div class="app-container">
     <!--工具栏-->
     <div>
-      <router-link :to="'/publish/honor/create/'">
-        <el-button
-          class="filter-item"
-          size="mini"
-          type="primary"
-          icon="el-icon-upload"
-          style="float:left;margin: -8px 10px 0 0;"
-        >发布
-        </el-button>
-      </router-link>
-      <router-link :to="{path: '/publish/honor/edit/', query: {row: crud.selections[0]}}">
-        <el-button
-          class="filter-item"
-          size="mini"
-          type="success"
-          icon="el-icon-edit"
-          style="float:left;margin: -8px 10px 0 0;"
-          :disabled="crud.selections.length !== 1"
-        >修改
-        </el-button>
-      </router-link>
+      <el-button
+        class="filter-item"
+        size="mini"
+        type="primary"
+        icon="el-icon-upload"
+        style="float:left;margin: -10px 10px 0 0;padding: 5px;padding-right: 8px;"
+        @click="toAdd"
+      >发布
+      </el-button>
+      <el-button
+        class="filter-item"
+        size="mini"
+        type="success"
+        icon="el-icon-edit"
+        style="float:left;margin: -10px 10px 0 0;padding: 5px;padding-right: 8px;"
+        :disabled="crud.selections.length !== 1"
+        @click="toEdit"
+      >修改
+      </el-button>
       <crudOperation style="float:left" />
     </div>
     <!--表格渲染-->
@@ -35,7 +33,7 @@
       <el-table-column :selectable="checkboxT" type="selection" width="55" />
       <el-table-column prop="title" align="center" label="标题" />
       <el-table-column align="center" prop="pepole" label="员工名" />
-      <el-table-column prop="honortitle" label="荣誉名称" align="center" />
+      <el-table-column :show-overflow-tooltip="true" prop="honortitle" label="荣誉简介" align="center" />
       <el-table-column prop="author" label="作者" align="center" />
       <el-table-column :show-overflow-tooltip="true" align="center" prop="imageUrl" label="缩略图">
         <template slot-scope="{row}">
@@ -70,6 +68,7 @@ export default {
   mixins: [presenter(defaultCrud), header(), crud()],
   data() {
     return {
+
     }
   },
   computed: {
@@ -82,8 +81,23 @@ export default {
     this.crud.optShow.edit = false
   },
   methods: {
+    toAdd() {
+      this.$router.push({
+        path: '/publish/honor/create/'
+      })
+      this.crud.selections.length = 0
+    },
+    toEdit() {
+      this.$router.push({
+        path: '/publish/honor/edit/',
+        query: {
+          row: this.crud.selections[0]
+        }
+      })
+      this.crud.selections.length = 0
+    },
     parseUrl(imgUrl) {
-      return this.baseApi + imgUrl
+      return `${window.g.baseURL}${imgUrl}`
     },
     checkboxT(row, rowIndex) {
       return row

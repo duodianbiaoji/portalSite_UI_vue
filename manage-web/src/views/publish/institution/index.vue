@@ -2,27 +2,25 @@
   <div class="app-container">
     <!--工具栏-->
     <div>
-      <router-link :to="'/publish/institution/create/'">
-        <el-button
-          class="filter-item"
-          size="mini"
-          type="primary"
-          icon="el-icon-upload"
-          style="float:left;margin: -8px 10px 0 0;"
-        >发布
-        </el-button>
-      </router-link>
-      <router-link :to="{path: '/publish/institution/edit/', query: {row: crud.selections[0]}}">
-        <el-button
-          class="filter-item"
-          size="mini"
-          type="success"
-          icon="el-icon-edit"
-          style="float:left;margin: -8px 10px 0 0;"
-          :disabled="crud.selections.length !== 1"
-        >修改
-        </el-button>
-      </router-link>
+      <el-button
+        class="filter-item"
+        size="mini"
+        type="primary"
+        icon="el-icon-upload"
+        style="float:left;margin: -10px 10px 0 0;padding: 5px;padding-right: 8px;"
+        @click="toAdd"
+      >发布
+      </el-button>
+      <el-button
+        class="filter-item"
+        size="mini"
+        type="success"
+        icon="el-icon-edit"
+        style="float:left;margin: -10px 10px 0 0;padding: 5px;padding-right: 8px;"
+        :disabled="crud.selections.length !== 1"
+        @click="toEdit"
+      >修改
+      </el-button>
       <crudOperation style="float:left" />
     </div>
     <!--表格渲染-->
@@ -65,6 +63,21 @@ export default {
     this.crud.optShow.edit = false
   },
   methods: {
+    toAdd() {
+      this.$router.push({
+        path: '/publish/institution/create/'
+      })
+      this.crud.selections.length = 0
+    },
+    toEdit() {
+      this.$router.push({
+        path: '/publish/institution/edit/',
+        query: {
+          row: this.crud.selections[0]
+        }
+      })
+      this.crud.selections.length = 0
+    },
     checkboxT(row, rowIndex) {
       return row
     }

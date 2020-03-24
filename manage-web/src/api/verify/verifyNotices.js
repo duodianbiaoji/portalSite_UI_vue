@@ -13,3 +13,12 @@ export function reviewNotices(id, form) {
   })
 }
 
+export function getNoticesDetail({ noticeid }) {
+  return request({
+    url: 'notice/getNoticeDetail',
+    method: 'get',
+    params: {
+      noticeid
+    }
+  })
+}

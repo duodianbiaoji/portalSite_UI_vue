@@ -59,7 +59,6 @@ export default {
   },
   methods: {
     seteditor() {
-      const _this = this
       this.editor = new E(this.$refs.toolbar, this.$refs.editor)
       // 配置菜单
       this.editor.customConfig.menus = [
@@ -93,7 +92,7 @@ export default {
           const formData = new FormData()
           formData.append('myfile', image)
           fileUpload(formData).then(data => {
-            insert(_this.baseApi + data.path)
+            insert(window.g.baseURL + data.path)
           })
         })
       }

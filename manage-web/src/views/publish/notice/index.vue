@@ -2,28 +2,47 @@
   <div class="app-container">
     <!--工具栏-->
     <div>
-      <router-link :to="'/publish/notice/create/'">
-        <el-button
-          class="filter-item"
-          size="mini"
-          type="primary"
-          icon="el-icon-upload"
-          style="float:left;margin: -8px 10px 0 0;"
-        >发布
-        </el-button>
-      </router-link>
-      <router-link :to="{path: '/publish/notice/edit/', query: {row: crud.selections[0]}}">
-        <el-button
-          class="filter-item"
-          size="mini"
-          type="success"
-          icon="el-icon-edit"
-          style="float:left;margin: -8px 10px 0 0;"
-          :disabled="crud.selections.length !== 1"
-        >修改
-        </el-button>
-      </router-link>
+      <el-button
+        class="filter-item"
+        size="mini"
+        type="primary"
+        icon="el-icon-upload"
+        style="float:left;margin: -10px 10px 0 0;padding: 5px;padding-right: 8px;"
+        @click="toAdd"
+      >发布
+      </el-button>
+      <el-button
+        class="filter-item"
+        size="mini"
+        type="success"
+        icon="el-icon-edit"
+        style="float:left;margin: -10px 10px 0 0;padding: 5px;padding-right: 8px;"
+        :disabled="crud.selections.length !== 1"
+        @click="toEdit"
+      >修改
+      </el-button>
       <crudOperation style="float:left" />
+    </div>
+    <div style="float: right;margin: -8px 20px 0 0;">
+      <el-select
+        v-model="query.status"
+        size="mini"
+        placeholder="状态"
+        class="filter-item"
+        style="width:85px"
+        @change="crud.toQuery"
+      >
+        <el-option
+          v-for="item in enabledTypeOptions"
+          :key="item.key"
+          :label="item.display_name"
+          :value="item.key"
+        />
+      </el-select>
+      <span>
+        <el-button class="filter-item" style="padding: 5px" size="mini" type="success" icon="el-icon-search" @click="crud.toQuery">搜索</el-button>
+        <el-button style="margin-left: 5px;padding: 5px;" class="filter-item" size="mini" type="warning" icon="el-icon-refresh-left" @click="crud.resetQuery()">重置</el-button>
+      </span>
     </div>
     <!--表格渲染-->
     <el-table
@@ -40,9 +59,10 @@
       <el-table-column prop="reviewstatusStr" align="center" label="审核状态" />
       <el-table-column
         label="审核详情"
+        align="center"
       >
         <template slot-scope="scope">
-          <el-button slot="reference" type="primary" size="mini" @click="handleClick(scope.row)">详情</el-button>
+          <el-button slot="reference" style="padding: 6px;" type="primary" size="mini" @click="handleClick(scope.row)">详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -85,7 +105,7 @@ import crudOperation from '@crud/CRUD.operation'
 import pagination from '@crud/Pagination'
 
 // crud交由presenter持有
-const defaultCrud = CRUD({ requestType: 'post', url: 'notice/getPublishNotices', crudMethod: { ...crudNoticesPublish }})
+const defaultCrud = CRUD({ requestType: 'post', url: 'notice/getReviewRecords', query: { status: '0' }, crudMethod: { ...crudNoticesPublish }})
 export default {
   name: 'Pictures',
   components: { crudOperation, pagination },
@@ -94,7 +114,12 @@ export default {
     return {
       showdetail: false,
       detail: {},
-      detailsList: {}
+      detailsList: {},
+      enabledTypeOptions: [
+        { key: '0', display_name: '未通过' },
+        { key: '1', display_name: '已通过' },
+        { key: '2', display_name: '全部' }
+      ]
     }
   },
   created() {
@@ -102,6 +127,21 @@ export default {
     this.crud.optShow.edit = false
   },
   methods: {
+    toAdd() {
+      this.$router.push({
+        path: '/publish/notice/create/'
+      })
+      this.crud.selections.length = 0
+    },
+    toEdit() {
+      this.$router.push({
+        path: '/publish/notice/edit/',
+        query: {
+          row: this.crud.selections[0]
+        }
+      })
+      this.crud.selections.length = 0
+    },
     handleClick(row) {
       this.detail = row
       this.showdetail = true
@@ -111,7 +151,7 @@ export default {
       })
     },
     checkboxT(row, rowIndex) {
-      return row
+      return row.reviewstatus !== 1
     }
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="el-dialog-div">
-    <el-form ref="form" :model="form" :rules="rules" size="small" label-width="90px">
+    <el-form ref="form" :model="form" :rules="rules" size="small" label-width="105px">
       <el-form-item label="新闻标题" prop="title">
         <el-input v-model="form.title" style="width: 30%;" />
       </el-form-item>
@@ -20,13 +20,12 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="新闻内容" prop="contentStr">
-        <Editor v-model="form.contentStr" :is-clear="isClear" @change="getEditorContent" />
+      <el-form-item label="新闻内容" prop="content">
+        <Editor v-model="form.content" :is-clear="isClear" @change="getEditorContent" />
       </el-form-item>
-      <el-form-item label="新闻图片" prop="imageid">
+      <el-form-item label="首页轮播图片" prop="imageid">
         <el-upload
           id="pictureUpload"
-          v-model="form.imageid"
           :limit="1"
           :file-list="pictureList"
           :on-preview="handlePictureCardPreview"
@@ -47,7 +46,6 @@
       <el-form-item label="上传附件" prop="annexes">
         <el-upload
           ref="upload"
-          v-model="form.annexes"
           multiple
           :headers="headers"
           :http-request="httpRequestFile"
@@ -55,6 +53,7 @@
           :on-success="handleSuccessFile"
           :on-error="handleErrorFile"
           :action="imagesUploadApi"
+          :file-list="uploadFileList"
         >
           <div class="eladmin-upload"><i class="el-icon-upload" /> 添加文件</div>
           <div slot="tip" class="el-upload__tip">可上传任意格式文件，且不超过100M</div>
@@ -80,7 +79,7 @@ import CRUD, { presenter, header, crud } from '@crud/crud'
 import Editor from '@/views/components/Editor'
 
 // crud交由presenter持有
-const defaultCrud = CRUD({ requestType: 'post', url: 'news/getPublishNews', crudMethod: { ...crudNewsPublish }})
+const defaultCrud = CRUD({ requestType: 'post', url: 'news/getReviewRecords', query: { status: '0' }, crudMethod: { ...crudNewsPublish }})
 export default {
   name: 'Pictures',
   components: { Editor },
@@ -97,7 +96,7 @@ export default {
         id: null,
         title: null,
         ntid: null,
-        contentStr: null,
+        content: null,
         imageid: 0,
         annexes: []
       },
@@ -125,6 +124,7 @@ export default {
       pictureResult: {},
       fileList: [],
       pictureList: [],
+      uploadFileList: [],
       isClear: false
     }
   },
@@ -148,7 +148,6 @@ export default {
       this.form.title = row.title
       this.form.ntid = row.ntid
       this.form.imageid = (Long.fromValue(row.imageid)).toString()
-      this.form.annexes = row.annexes
       // const imageUrl = this.baseApi + row.imageUrl
       /* this.pictureList.push({
         'url': imageUrl
@@ -159,18 +158,19 @@ export default {
     },
     getNewsContent(row) {
       getNewsContent((Long.fromValue(row.id)).toString()).then(res => {
-        this.form.contentStr = res.contentStr
+        this.form.content = res.content
+        this.uploadFileList = res.annexes
       })
     },
     getEditorContent(data) {
-      this.form.contentStr = data
+      this.form.content = data
     },
     resetForm() {
       this.form = {
         id: null,
         title: null,
         ntid: null,
-        contentStr: null,
+        content: null,
         imageid: 0,
         annexes: []
       }
@@ -187,7 +187,7 @@ export default {
               })
               this.submitLoading = false
               return false
-            } else if (!this.form.contentStr) {
+            } else if (!this.form.content) {
               this.$message({
                 message: '新闻内容不能为空',
                 type: 'warning'
@@ -225,7 +225,7 @@ export default {
               })
               this.submitLoading = false
               return false
-            } else if (!this.form.contentStr) {
+            } else if (!this.form.content) {
               this.$message({
                 message: '新闻内容不能为空',
                 type: 'warning'

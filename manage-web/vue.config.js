@@ -2,6 +2,8 @@
 const path = require('path')
 const defaultSettings = require('./src/settings.js')
 
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
@@ -43,7 +45,17 @@ module.exports = {
         '@': resolve('src'),
         '@crud': resolve('src/components/Crud')
       }
-    }
+    },
+    plugins: [
+      new CopyWebpackPlugin([ // 打包时执行拷贝
+        {
+          // eslint-disable-next-line no-path-concat
+          from: __dirname + '/public/config/dynamicConfig.js',
+          // eslint-disable-next-line no-path-concat
+          to: __dirname + '/dist/config/dynamicConfig.js'
+        }
+      ])
+    ]
   },
   chainWebpack(config) {
     config.plugins.delete('preload') // TODO: need test

@@ -7,7 +7,6 @@ import Vue from 'vue'
  * @author Bai Xuepeng
  * @param {*} options <br>
  * @return crud instance.
- * @example
  */
 function CRUD(options) {
   const defaultOptions = {
@@ -19,12 +18,16 @@ function CRUD(options) {
     data: [],
     // 选择项
     selections: [],
+    // 待查询的对象
+    query: {},
     // 查询数据的参数
     params: {},
     // Form 表单
     form: {},
     // 重置表单
     defaultForm: () => {},
+    // 排序规则，默认 id 降序， 支持多字段排序 ['id,desc', 'createTime,asc']
+    sort: ['id,desc'],
     // 等待时间
     time: 50,
     // 请求方法类型
@@ -33,7 +36,8 @@ function CRUD(options) {
     crudMethod: {
       add: (form) => {},
       delete: (id) => {},
-      edit: (form) => {}
+      edit: (form) => {},
+      get: (id) => {}
     },
     // 主页操作栏显示哪些按钮
     optShow: {
@@ -42,6 +46,8 @@ function CRUD(options) {
       del: true,
       refresh: true
     },
+    // 自定义一些扩展属性
+    props: {},
     // 在主页准备
     queryOnPresenterCreated: true,
     // 调试开关
@@ -240,7 +246,6 @@ function CRUD(options) {
         return
       }
       crud.status.add = CRUD.STATUS.PROCESSING
-      console.log('添加发送参数', JSON.stringify(crud.form))
       crud.crudMethod.add(JSON.stringify(crud.form)).then(() => {
         crud.status.add = CRUD.STATUS.NORMAL
         crud.resetForm()
@@ -260,7 +265,6 @@ function CRUD(options) {
         return
       }
       crud.status.edit = CRUD.STATUS.PROCESSING
-      console.log('修改发送参数', JSON.stringify(crud.form))
       crud.crudMethod.edit(JSON.stringify(crud.form)).then(() => {
         crud.status.edit = CRUD.STATUS.NORMAL
         crud.getDataStatus(crud.form.id).edit = CRUD.STATUS.NORMAL
@@ -316,7 +320,9 @@ function CRUD(options) {
     getQueryParams: function() {
       return {
         current: crud.page.page,
-        pageSize: crud.page.size
+        pageSize: crud.page.size,
+        ...crud.query,
+        ...crud.params
       }
     },
     // 当前页改变
@@ -339,6 +345,20 @@ function CRUD(options) {
     // 选择改变
     selectionChangeHandler(val) {
       crud.selections = val
+    },
+    /**
+     * 重置查询参数
+     * @param {Boolean} toQuery 重置后进行查询操作
+     */
+    resetQuery(toQuery = true) {
+      const defaultQuery = JSON.parse(JSON.stringify(crud.defaultQuery))
+      const query = crud.query
+      Object.keys(query).forEach(key => {
+        query[key] = defaultQuery[key]
+      })
+      if (toQuery) {
+        crud.toQuery()
+      }
     },
     /**
      * 重置表单
@@ -382,6 +402,41 @@ function CRUD(options) {
       return crud.dataStatus[id]
     },
     /**
+     * 用于树形表格多选, 选中所有
+     * @param selection
+     */
+    selectAllChange(selection) {
+      // 如果选中的数目与请求到的数目相同就选中子节点，否则就清空选中
+      if (selection && selection.length === crud.data.length) {
+        selection.forEach(val => {
+          crud.selectChange(selection, val)
+        })
+      } else {
+        crud.findVM('presenter').$refs['table'].clearSelection()
+      }
+    },
+    /**
+     * 用于树形表格多选，单选的封装
+     * @param selection
+     * @param row
+     */
+    selectChange(selection, row) {
+      // 如果selection中存在row代表是选中，否则是取消选中
+      if (selection.find(val => { return val.id === row.id })) {
+        if (row.children) {
+          row.children.forEach(val => {
+            crud.findVM('presenter').$refs['table'].toggleRowSelection(val, true)
+            selection.push(val)
+            if (val.children) {
+              crud.selectChange(selection, val)
+            }
+          })
+        }
+      } else {
+        crud.toggleRowSelection(selection, row)
+      }
+    },
+    /**
      * 切换选中状态
      * @param selection
      * @param data
@@ -405,6 +460,9 @@ function CRUD(options) {
         type: type,
         duration: 2500
       })
+    },
+    updateProp(name, value) {
+      Vue.set(crud.props, name, value)
     }
   }
   const crud = Object.assign({}, data)
@@ -415,6 +473,8 @@ function CRUD(options) {
   // 记录初始默认的查询参数，后续重置查询时使用
   Object.assign(crud, {
     defaultQuery: JSON.parse(JSON.stringify(data.query)),
+    // 预留4位存储：组件 主页、头部、分页、表单，调试查看也方便找
+    vms: Array(4),
     /**
      * 注册组件实例
      * @param {String} type 类型
@@ -441,11 +501,16 @@ function CRUD(options) {
       this.vms.splice(this.vms.findIndex(e => e && e.vm === vm), 1)
     }
   })
+  // 冻结处理，需要扩展数据的话，使用crud.updateProp(name, value)，以crud.props.name形式访问，这个是响应式的，可以做数据绑定
+  Object.freeze(crud)
   return crud
 }
 
 // hook VM
 function callVmHook(crud, hook) {
+  if (crud.debug) {
+    console.log('callVmHook: ' + hook)
+  }
   let ret = true
   const nargs = [crud]
   for (let i = 2; i < arguments.length; ++i) {
@@ -487,8 +552,18 @@ function presenter(crud) {
   }
   return {
     inject: ['crud'],
+    beforeCreate() {
+      // 由于initInjections在initProvide之前执行，如果该组件自己就需要crud，需要在initInjections前准备好crud
+      this._provided = {
+        crud,
+        'crud.query': crud.query,
+        'crud.page': crud.page,
+        'crud.form': crud.form
+      }
+    },
     data() {
       return {
+        searchToggle: true,
         columns: obColumns()
       }
     },
@@ -500,6 +575,20 @@ function presenter(crud) {
     },
     beforeDestroy() {
       this.crud.unregisterVM(this)
+    },
+    mounted() {
+      /* const columns = {}
+      this.$refs.table.columns.forEach(e => {
+        if (!e.property || e.type !== 'default') {
+          return
+        }
+        columns[e.property] = {
+          label: e.label,
+          visible: true
+        }
+      })
+      this.columns = obColumns(columns)
+      this.crud.updateProp('tableColumns', columns)*/
     }
   }
 }

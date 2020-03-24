@@ -8,6 +8,7 @@
         size="mini"
         type="warning"
         icon="el-icon-refresh"
+        style="padding: 5px;"
         @click="refresh"
       >
         刷新
@@ -18,6 +19,7 @@
         type="danger"
         icon="el-icon-refresh-left"
         size="mini"
+        style="padding: 5px;"
         :loading="crud.resetPassLoading"
         :disabled="crud.selections.length === 0"
         @click="crud.resetPassDialogVisible = true"

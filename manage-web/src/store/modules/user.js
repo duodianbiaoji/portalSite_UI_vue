@@ -33,6 +33,7 @@ const user = {
           setToken(res.token)
           commit('SET_TOKEN', res.token)
           commit('SET_USER', res.username)
+          sessionStorage.setItem('realname', res.realname)
           // setUserInfo(res.user, commit)
           // 第一次加载菜单时用到， 具体见 src 目录下的 permission.js
           // commit('SET_LOAD_MENUS', true)
@@ -78,6 +79,7 @@ const user = {
 export const logOut = (commit) => {
   commit('SET_TOKEN', '')
   commit('SET_ROLES', [])
+  sessionStorage.removeItem('realname')
   removeToken()
 }
 

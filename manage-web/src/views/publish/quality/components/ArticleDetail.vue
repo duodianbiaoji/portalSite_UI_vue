@@ -20,19 +20,19 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="文章内容" prop="contentStr">
-        <Editor v-model="form.contentStr" :is-clear="isClear" @change="getEditorContent" />
+      <el-form-item label="文章内容" prop="content">
+        <Editor v-model="form.content" :is-clear="isClear" @change="getEditorContent" />
       </el-form-item>
       <el-form-item label="上传附件" prop="annexes">
         <el-upload
           ref="upload"
-          v-model="form.annexes"
           multiple
           :headers="headers"
           :http-request="httpRequestFile"
           :before-remove="handleBeforeRemoveFile"
           :on-success="handleSuccessFile"
           :on-error="handleErrorFile"
+          :file-list="uploadFileList"
           :action="imagesUploadApi"
         >
           <div class="eladmin-upload"><i class="el-icon-upload" /> 添加文件</div>
@@ -75,7 +75,7 @@ export default {
         id: null,
         title: null,
         type: null,
-        contentStr: null,
+        content: null,
         annexes: []
       },
       submitLoading: false,
@@ -103,6 +103,7 @@ export default {
       pictureResult: {},
       fileList: [],
       pictureList: [],
+      uploadFileList: [],
       isClear: false
     }
   },
@@ -124,25 +125,25 @@ export default {
       this.form.id = (Long.fromValue(row.id)).toString()
       this.form.title = row.title
       this.form.type = row.type
-      this.form.annexes = row.annexes
       this.$nextTick(() => {
         this.$refs['form'].clearValidate()
       })
     },
     getQualityContent(row) {
       getQualityContent((Long.fromValue(row.id)).toString()).then(res => {
-        this.form.contentStr = res.contentStr
+        this.form.content = res.content
+        this.uploadFileList = res.annexes
       })
     },
     getEditorContent(data) {
-      this.form.contentStr = data
+      this.form.content = data
     },
     resetForm() {
       this.form = {
         id: null,
         title: null,
         type: null,
-        contentStr: null,
+        content: null,
         annexes: []
       }
     },
@@ -158,7 +159,7 @@ export default {
               })
               this.submitLoading = false
               return false
-            } else if (!this.form.contentStr) {
+            } else if (!this.form.content) {
               this.$message({
                 message: '质量文档内容不能为空',
                 type: 'warning'
@@ -196,7 +197,7 @@ export default {
               })
               this.submitLoading = false
               return false
-            } else if (!this.form.contentStr) {
+            } else if (!this.form.content) {
               this.$message({
                 message: '质量文档内容不能为空',
                 type: 'warning'

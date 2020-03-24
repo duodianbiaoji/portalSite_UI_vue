@@ -38,8 +38,8 @@ export const constantRouterMap = [
     redirect: '/dashboard',
     children: [{
       path: 'dashboard',
-      name: '首页',
-      component: () => import('@/views/dashboard/index'),
+      name: 'Dashboard',
+      component: () => import('@/views/home'),
       meta: { title: '首页', icon: 'index', affix: true, noCache: true }
     }]
   },
@@ -186,16 +186,37 @@ export const constantRouterMap = [
         meta: { title: '新闻审核', icon: 'newsverify', noCache: true }
       },
       {
+        path: 'news/verify',
+        name: '新闻审核详情',
+        component: () => import('@/views/verify/news/components/newsDetails'),
+        meta: { title: '新闻审核详情', noCache: true, activeMenu: '/verify/news' },
+        hidden: true
+      },
+      {
         path: 'notice',
         name: '通告审核',
         component: () => import('@/views/verify/notice/index'),
         meta: { title: '通告审核', icon: 'noticeverify', noCache: true }
       },
       {
+        path: 'notice/verify',
+        name: '通告审核详情',
+        component: () => import('@/views/verify/notice/components/noticeDetails'),
+        meta: { title: '通告审核详情', noCache: true, activeMenu: '/verify/notice' },
+        hidden: true
+      },
+      {
         path: 'share',
         name: '分享审核',
         component: () => import('@/views/verify/share/index'),
         meta: { title: '分享审核', icon: 'shareverify', noCache: true }
+      },
+      {
+        path: 'share/verify',
+        name: '知识分享审核详情',
+        component: () => import('@/views/verify/share/components/shareDetails'),
+        meta: { title: '通告审核详情', noCache: true, activeMenu: '/verify/share' },
+        hidden: true
       },
       {
         path: 'comment',

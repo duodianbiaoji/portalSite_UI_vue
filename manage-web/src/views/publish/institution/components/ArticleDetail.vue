@@ -20,19 +20,19 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="制度内容" prop="contentStr">
-        <Editor v-model="form.contentStr" :is-clear="isClear" @change="getEditorContent" />
+      <el-form-item label="制度内容" prop="content">
+        <Editor v-model="form.content" :is-clear="isClear" @change="getEditorContent" />
       </el-form-item>
       <el-form-item label="上传附件" prop="annexes">
         <el-upload
           ref="upload"
-          v-model="form.annexes"
           multiple
           :headers="headers"
           :http-request="httpRequestFile"
           :before-remove="handleBeforeRemoveFile"
           :on-success="handleSuccessFile"
           :on-error="handleErrorFile"
+          :file-list="uploadFileList"
           :action="imagesUploadApi"
         >
           <div class="eladmin-upload"><i class="el-icon-upload" /> 添加文件</div>
@@ -40,7 +40,7 @@
         </el-upload>
       </el-form-item>
       <el-form-item size="medium" style="text-align: left;margin-bottom: 45px;">
-        <el-button @click="$router.push('/publish/notice')">返回</el-button>
+        <el-button @click="$router.push('/publish/institution')">返回</el-button>
         <el-button :loading="submitLoading" type="primary" @click="isEdit===false?createData():updateData()">发布</el-button>
       </el-form-item>
     </el-form>
@@ -75,7 +75,7 @@ export default {
         id: null,
         title: null,
         dptid: null,
-        contentStr: null,
+        content: null,
         annexes: []
       },
       submitLoading: false,
@@ -95,6 +95,7 @@ export default {
       pictureResult: {},
       fileList: [],
       pictureList: [],
+      uploadFileList: [],
       isClear: false
     }
   },
@@ -117,25 +118,25 @@ export default {
       this.form.id = (Long.fromValue(row.id)).toString()
       this.form.title = row.title
       this.form.dptid = row.dptid
-      this.form.annexes = row.annexes
       this.$nextTick(() => {
         this.$refs['form'].clearValidate()
       })
     },
     getInstitutionContent(row) {
       getInstitutionContent((Long.fromValue(row.id)).toString()).then(res => {
-        this.form.contentStr = res.contentStr
+        this.form.content = res.content
+        this.uploadFileList = res.annexes
       })
     },
     getEditorContent(data) {
-      this.form.contentStr = data
+      this.form.content = data
     },
     resetForm() {
       this.form = {
         id: null,
         title: null,
         dptid: null,
-        contentStr: null,
+        content: null,
         annexes: []
       }
     },
@@ -151,7 +152,7 @@ export default {
               })
               this.submitLoading = false
               return false
-            } else if (!this.form.contentStr) {
+            } else if (!this.form.content) {
               this.$message({
                 message: '制度文档内容不能为空',
                 type: 'warning'
@@ -189,7 +190,7 @@ export default {
               })
               this.submitLoading = false
               return false
-            } else if (!this.form.contentStr) {
+            } else if (!this.form.content) {
               this.$message({
                 message: '制度文档内容不能为空',
                 type: 'warning'

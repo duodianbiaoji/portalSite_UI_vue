@@ -13,3 +13,12 @@ export function reviewNews(id, form) {
   })
 }
 
+export function getNewsDetail({ newsid }) {
+  return request({
+    url: 'news/getNewsDetail',
+    method: 'get',
+    params: {
+      newsid
+    }
+  })
+}

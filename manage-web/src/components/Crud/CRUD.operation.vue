@@ -6,6 +6,7 @@
       size="mini"
       type="primary"
       icon="el-icon-plus"
+      style="padding: 5px;margin-top: -2px;"
       @click="crud.toAdd"
     >
       新增
@@ -16,6 +17,7 @@
       size="mini"
       type="success"
       icon="el-icon-edit"
+      style="padding: 5px;margin-top: -2px;"
       :disabled="crud.selections.length !== 1"
       @click="crud.toEdit(crud.selections[0])"
     >
@@ -28,9 +30,10 @@
       type="danger"
       icon="el-icon-delete"
       size="mini"
+      style="padding: 5px;margin-top: -2px;"
       :loading="crud.delAllLoading"
       :disabled="crud.selections.length !== 1"
-      @click="toDelete(crud.selections)"
+      @click="centerDialogVisible = true"
     >
       删除
     </el-button>
@@ -41,14 +44,35 @@
       size="mini"
       type="warning"
       icon="el-icon-refresh"
+      style="padding: 5px;margin-top: -2px;"
       @click="crud.refresh()"
     >
       刷新
     </el-button>
+    <el-dialog
+      title="删除确认"
+      :visible.sync="centerDialogVisible"
+      width="30%"
+      center
+      @close="cancel"
+    >
+      <el-input
+        v-model="articleTitle"
+        style="width: 70%;margin-left: 15px;"
+        placeholder="请输入标题内容"
+        @input="changeInput"
+      />
+      <div slot="footer">
+        <el-button style="margin-left: 140px;" @click="cancel">取 消</el-button>
+        <el-button :loading="delLoading" :disabled="deleteStatus" type="primary" @click="deleteData(crud.selections[0])">确 定</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 <script>
 import { crud } from '@crud/crud'
+import Long from 'long'
 export default {
   mixins: [crud()],
   props: {
@@ -59,11 +83,14 @@ export default {
   },
   data() {
     return {
-
+      centerDialogVisible: false,
+      articleTitle: null,
+      deleteStatus: true,
+      delLoading: false
     }
   },
   methods: {
-    toDelete(datas) {
+    /* toDelete(datas) {
       this.$confirm(`确认删除选中的${datas.length}条数据?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -72,6 +99,36 @@ export default {
         this.crud.delAllLoading = true
         this.crud.doDelete(datas)
       }).catch(() => {
+      })
+    },*/
+    cancel() {
+      this.centerDialogVisible = false
+      this.articleTitle = null
+      this.deleteStatus = true
+    },
+    changeInput() {
+      if (this.articleTitle !== this.crud.selections[0].title) return
+      else this.deleteStatus = false
+    },
+    commonHandle() {
+      this.deleteStatus = true
+      this.articleTitle = null
+      this.centerDialogVisible = false
+      setTimeout(() => {
+        this.delLoading = false
+      }, this.crud.time)
+    },
+    deleteData(data) {
+      const ids = []
+      ids.push(Long.fromValue(data.id).toString())
+      this.delLoading = true
+      this.crud.crudMethod.del(ids.join(',')).then(() => {
+        this.crud.dleChangePage(1)
+        this.crud.delSuccessNotify()
+        this.commonHandle()
+        this.crud.refresh()
+      }).catch(() => {
+        this.commonHandle()
       })
     }
   }

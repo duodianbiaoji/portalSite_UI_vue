@@ -13,14 +13,14 @@ export function reviewShare(id, form) {
   })
 }
 
-export function getVerifyDetail(id) {
-  const params = {
-    articleid: id
-  }
+export function getKnlgeShareDetail({ articleid, type }) {
   return request({
-    url: 'knowledgeShare/getReviewInfo',
+    url: 'knowledgeShare/getKnlgeShareDetail',
     method: 'get',
-    params
+    params: {
+      articleid,
+      type
+    }
   })
 }
 

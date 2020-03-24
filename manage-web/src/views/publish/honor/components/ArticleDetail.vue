@@ -23,10 +23,10 @@
           show-word-limit
         />
       </el-form-item>
-      <el-form-item label="表彰内容" prop="contentStr">
-        <Editor v-model="form.contentStr" :is-clear="isClear" @change="getEditorContent" />
+      <el-form-item label="表彰内容" prop="content">
+        <Editor v-model="form.content" :is-clear="isClear" @change="getEditorContent" />
       </el-form-item>
-      <el-form-item label="表彰图片" prop="imageid">
+      <el-form-item label="员工图片" prop="imageid">
         <el-upload
           id="pictureUpload"
           v-model="form.imageid"
@@ -50,13 +50,13 @@
       <el-form-item label="上传附件" prop="annexes">
         <el-upload
           ref="upload"
-          v-model="form.annexes"
           multiple
           :headers="headers"
           :http-request="httpRequestFile"
           :before-remove="handleBeforeRemoveFile"
           :on-success="handleSuccessFile"
           :on-error="handleErrorFile"
+          :file-list="uploadFileList"
           :action="imagesUploadApi"
         >
           <div class="eladmin-upload"><i class="el-icon-upload" /> 添加文件</div>
@@ -101,7 +101,7 @@ export default {
         pepole: null,
         honortitle: null,
         title: null,
-        contentStr: null,
+        content: null,
         imageid: 0,
         annexes: []
       },
@@ -131,6 +131,7 @@ export default {
       pictureResult: {},
       fileList: [],
       pictureList: [],
+      uploadFileList: [],
       isClear: false,
       userList: [],
       timeout: null
@@ -157,7 +158,6 @@ export default {
       this.form.pepole = row.pepole
       this.form.honortitle = row.honortitle
       this.form.imageid = (Long.fromValue(row.imageid)).toString()
-      this.form.annexes = row.annexes
       // const imageUrl = this.baseApi + row.imageUrl
       /* this.pictureList.push({
         'url': imageUrl
@@ -168,11 +168,12 @@ export default {
     },
     getHonourContent(row) {
       getHonourContent((Long.fromValue(row.id)).toString()).then(res => {
-        this.form.contentStr = res.contentStr
+        this.form.content = res.content
+        this.uploadFileList = res.annexes
       })
     },
     getEditorContent(data) {
-      this.form.contentStr = data
+      this.form.content = data
     },
     resetForm() {
       this.form = {
@@ -180,7 +181,7 @@ export default {
         pepole: null,
         honortitle: null,
         title: null,
-        contentStr: null,
+        content: null,
         imageid: 0,
         annexes: []
       }
@@ -223,7 +224,7 @@ export default {
               })
               this.submitLoading = false
               return false
-            } else if (!this.form.contentStr) {
+            } else if (!this.form.content) {
               this.$message({
                 message: '荣誉内容不能为空',
                 type: 'warning'
@@ -261,7 +262,7 @@ export default {
               })
               this.submitLoading = false
               return false
-            } else if (!this.form.contentStr) {
+            } else if (!this.form.content) {
               this.$message({
                 message: '荣誉内容不能为空',
                 type: 'warning'

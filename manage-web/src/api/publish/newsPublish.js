@@ -61,4 +61,12 @@ export function getNewsContent(id) {
   })
 }
 
+export function getNewsList(data) {
+  return request({
+    url: 'news/getReviewRecords',
+    method: 'post',
+    data: data
+  })
+}
+
 export default { add, edit, del }

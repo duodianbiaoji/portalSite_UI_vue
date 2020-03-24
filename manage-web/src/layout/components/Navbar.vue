@@ -33,7 +33,7 @@
               布局设置
             </el-dropdown-item>
           </span>
-          <span style="display:block;" @click="$refs.pass.dialog = true">
+          <span v-if="realname !== '超级管理员'" style="display:block;" @click="$refs.pass.dialog = true">
             <el-dropdown-item>
               修改密码
             </el-dropdown-item>
@@ -74,7 +74,8 @@ export default {
   data() {
     return {
       Avatar: Avatar,
-      dialogVisible: false
+      dialogVisible: false,
+      realname: null
     }
   },
   computed: {
@@ -95,6 +96,9 @@ export default {
         })
       }
     }
+  },
+  mounted() {
+    this.realname = sessionStorage.getItem('realname')
   },
   methods: {
     toggleSideBar() {
