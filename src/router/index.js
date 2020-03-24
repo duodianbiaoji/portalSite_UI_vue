@@ -47,7 +47,7 @@ export const constantRouter = [
             path:'news-show/:newsid',
             name:'news-show',
             component:()=>import('@/views/news/news-show'),
-            meta:{title:'新闻详情'},
+            meta:{title:'新闻详情',activeMenu:"/news/news-trends"},
             hidden:true
            }
        ]
@@ -68,7 +68,7 @@ export const constantRouter = [
                path:'notice-show/:noticeid',
                name:'notice-show',
                component:()=>import('@/views/notice/notice-show'),
-               meta:{title:'公告详情'},
+               meta:{title:'公告详情',activeMenu:"/notice/notice-trends"},
                hidden:true
            }
        ]
@@ -89,6 +89,7 @@ export const constantRouter = [
             path:'quality-details/:articleid',
             name:'quality-details',
             component:()=>import('@/views/quality/quality-details'),
+            meta:{title:'质量详情',activeMenu:"/quality/quality-list"},
             hidden:true,
             }
         ]
@@ -110,7 +111,7 @@ export const constantRouter = [
                 path:'honor-details/:articleid',
                 name:'honor-details',
                 component:()=>import('@/views/honor/honor-details'),
-                meta:{title:'员工信息'},
+                meta:{title:'员工信息',activeMenu:"/honor/honor-list"},
                 hidden:true,
             }
         ]
@@ -125,13 +126,13 @@ export const constantRouter = [
             path:'train-list',
             name:'train-list',
             component:()=>import('@/views/train/index'),
-            meta:{title:'培训专栏'}
+            meta:{title:'培训专栏',activeMenu:"/train/index"}
             },
             {
                 path:'train-details/:articleid',
                 name:'train-details',
                 component:()=>import('@/views/train/details'),
-                meta:{title:'文档详情'},
+                meta:{title:'文档详情',activeMenu:"/train/index"},
                 hidden:true,
             }
         ]
@@ -151,7 +152,7 @@ export const constantRouter = [
                 path:'institution-details/:articleid',
                 name:'institution-details',
                 component:()=>import('@/views/institution/details'),
-                meta:{title:'文档详情'},
+                meta:{title:'文档详情',activeMenu:"/institution/index"},
                 hidden:true,
             }
         ]
@@ -174,14 +175,14 @@ export const constantRouter = [
                 path:'details/:articleid',
                 name:'knowledge-details',
                 component:()=>import('@/views/knowledge-sharing/details'),
-                meta:{title:'知识详情'},
+                meta:{title:'知识详情',activeMenu:"/knowledge-sharing/index"},
                 hidden:true
             },
             {
                 path:'release/:id/:isupdate',
                 name:'release',
                 component:()=>import('@/views/knowledge-sharing/release'),
-                meta:{title:'发布经验'},
+                meta:{title:'发布经验',activeMenu:"/knowledge-sharing/index"},
                 hidden:true
             }
         ]

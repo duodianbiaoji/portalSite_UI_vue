@@ -71,7 +71,7 @@ export default {
             return this.$route.params.articleid
         },
         scrUrl(){
-            return `${process.env.VUE_APP_BASE_API}/${this.detailInfo.imageUrl}`
+            return `${window.g.server_url}/${this.detailInfo.imageUrl}`
         }
      },
      components:{

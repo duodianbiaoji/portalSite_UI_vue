@@ -44,7 +44,7 @@ export default {
         },
         watch: {
                 activeInfo(){
-                        this.scrUrl = `${process.env.VUE_APP_BASE_API}/${this.activeInfo.imageUrl}`
+                        this.scrUrl = `${window.g.server_url}/${this.activeInfo.imageUrl}`
                        
                 }
         }

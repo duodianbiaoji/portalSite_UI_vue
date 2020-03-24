@@ -33,7 +33,7 @@
         },
         computed: {
            imageUrl(){
-                 return `${process.env.VUE_APP_BASE_API}/${this.info.imageUrl}`
+                 return `${window.g.server_url}/${this.info.imageUrl}`
            } 
         },
         methods: {

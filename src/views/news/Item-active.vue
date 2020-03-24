@@ -43,7 +43,7 @@ export default {
     },
     methods: {
         handleGoDetail(){
-            this.$router.push({path:'news-show',query:{newsid:this.row.row.id}})
+            this.$router.push({name:'news-show',params:{newsid:this.row.row.id}})
         }
     },
     watch:{

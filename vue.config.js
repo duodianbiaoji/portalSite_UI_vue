@@ -7,6 +7,7 @@ const defaultSettings = require('./src/setting.js')
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
+const CopyWebpackPlugin = require("copy-webpack-plugin") 
 
 const name =defaultSettings.documentTitle || "中亚通茂门户网站" // page title
 
@@ -52,6 +53,14 @@ module.exports = {
         '@': resolve('src')
       }
     },
+    plugins: [
+      new CopyWebpackPlugin([ //打包时执行拷贝
+        {
+          from: __dirname + "/public/config/dynamicConfig.js",
+          to:   __dirname + "/dist/config/dynamicConfig.js"
+        }
+      ])
+    ]
   },
   chainWebpack(config) {
     config.plugins.delete('preload') // TODO: need test

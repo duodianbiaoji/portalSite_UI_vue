@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-02-23 18:16:10
- * @LastEditTime: 2020-03-17 13:09:54
+ * @LastEditTime: 2020-03-23 09:14:53
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\views\home\Home.vue
@@ -12,7 +12,7 @@
         <carousel></carousel>
         <div style="margin:10px 18% " >
                 <news></news>
-                <el-row type="flex" :gutter="60" justify="space-btween" style="margin-top: 40px" >
+                <el-row  type="flex" :gutter="60" justify="space-btween" style="margin-top: 40px" >
                         <el-col ref="notice"  :span="12" style="height: 400px;" :class="noticeClass" >
                             <notice></notice>
                         </el-col>
@@ -20,8 +20,8 @@
                                 <quality></quality>
                         </el-col>
                 </el-row>
-                <module-entrance ref="entrance" :class="entranceClass" ></module-entrance>
-                <honor :class="honorClass" style="margin-bottom: 100px;"></honor>
+                <module-entrance  ref="entrance" :class="entranceClass" ></module-entrance>
+                <honor :class="honorClass" style="margin: 100px 0px;"></honor>
         </div>
         
     </div>
@@ -40,7 +40,8 @@ export default {
             noticeClass:["animated","bounceInLeft"],
             qualityClass:["animated","bounceInRight"],
             entranceClass:["animated","rotateInDownLeft"],
-            honorClass: ["animated","fadeInLeftBig"]
+            honorClass: ["animated","fadeInLeftBig"],
+            isNoticeShow:false,
         }
     },
     components:{
@@ -69,29 +70,33 @@ export default {
             if(scrollTop >= maxTop){
                 this.noticeClass=["animated","fadeInUp"]
                 this.qualityClass=["animated","fadeInUp"]
+                this.isNoticeShow = true
             }else if(scrollTop <= minTop){
                 this.noticeClass=["animated","fadeOutDown"]
                 this.qualityClass=["animated","fadeOutDown"]
+                this.isNoticeShow = false
             }
         },
         handleEntrance(scrollTop,minTop,maxTop){
             if(scrollTop >= maxTop){
 
                 this.entranceClass=["animated","fadeInUp"]
-                
+               
             }else if(scrollTop <= minTop){
 
                 this.entranceClass=["animated","fadeOutDown"]
+               
             }
         },
         handleHonor(scrollTop,minTop,maxTop){
             if(scrollTop >= maxTop){
 
                 this.honorClass=["animated","fadeInUp"]
-
+               
             }else if(scrollTop <= minTop){
 
                 this.honorClass=["animated","fadeOutLeftBig"]
+                
             }
         }
     }

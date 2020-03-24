@@ -32,7 +32,7 @@ export default {
                     content:'一些公司培训相关的文档'
                 },
                 {
-                    linkTo:{name:'institution'},
+                    linkTo:{name:'knowledge-sharing'},
                     colClass:['module-project-content'],
                     colConClass:['module-item'],
                     colImgSrc:require('@/assets/images/知识共享.png'),

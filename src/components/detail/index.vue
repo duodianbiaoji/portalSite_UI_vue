@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-03-15 22:01:20
- * @LastEditTime: 2020-03-22 16:51:45
+ * @LastEditTime: 2020-03-23 09:30:16
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \portalSite_UI_vue\src\components\detail\index.vue
@@ -12,7 +12,7 @@
             <h2 style="text-align: center;">{{detailsData.title}}</h2>
         </div>
         <div style="text-align: center;" >
-            <span>{{detailsData.publishdate}}</span>
+            <span><svg-icon icon-class="dateDetail" class-name="from-like"></svg-icon>{{detailsData.publishdate}}</span>
             <span style="margin-left: 20px"><svg-icon icon-class="people" class-name="from-like" ></svg-icon>{{detailsData.author}}</span>
             <span style="margin-left: 20px" ><svg-icon icon-class="eyeball" class-name="from-like" ></svg-icon>{{detailsData.pageview}}</span>
         </div>
@@ -63,8 +63,8 @@ import Share from "@/components/detail/share"
                 isFile:false,
                 frontId:0,
                 nextId:0,
-                frontName:"",
-                nextName:"",
+                frontName:"无",
+                nextName:"无",
             }
         },
         watch: {
@@ -125,14 +125,14 @@ import Share from "@/components/detail/share"
                         this.nextId = nextArr[0]
                         this.nextName = nextArr[1]
                       }else{
-                        this.nextName = ""
+                        this.nextName = "无"
                       }
                       if(this.detailsData.front !== null){
                         let frontArr = this.detailsData.front.split("|")
                         this.frontId = frontArr[0]
                         this.frontName = frontArr[1]
                       }else{
-                        this.frontName = ""
+                        this.frontName = "无"
                       }
                       
 
