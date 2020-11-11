@@ -26,5 +26,8 @@ npm run preview -- --report
 # code format check
 npm run lint
 
-后端项目地址：https://github.com/maokofan/portalSite
+# 后端项目地址
+https://github.com/maokofan/portalSite
+# 特别声明 
+网站仅供学习交流使用，不得用于商业目的，若相关声明违反了版权，请联系删除。
 
