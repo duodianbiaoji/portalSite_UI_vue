@@ -1,0 +1,288 @@
+<template>
+  <div class="el-dialog-div">
+    <el-form ref="form" :model="form" :rules="rules" size="small" label-width="90px">
+      <el-form-item label="培训标题" prop="title">
+        <el-input v-model="form.title" style="width: 30%;" @input="isExistTitle" />
+        <span v-if="TitleUnExist" style="margin-left: 15px;color: green;font-size: 16px"><i class="el-icon-success" />文章标题可用</span>
+        <span v-if="TitleExist" style="margin-left: 15px;color: red;font-size: 16px"><i class="el-icon-error" />文章标题已存在</span>
+      </el-form-item>
+      <el-form-item label="培训内容" prop="content">
+        <Editor v-model="form.content" :is-clear="isClear" @change="getEditorContent" />
+      </el-form-item>
+      <el-form-item label="上传附件" prop="annexes">
+        <el-upload
+          ref="upload"
+          multiple
+          :headers="headers"
+          :http-request="httpRequestFile"
+          :before-remove="handleBeforeRemoveFile"
+          :on-success="handleSuccessFile"
+          :on-error="handleErrorFile"
+          :file-list="uploadFileList"
+          :action="imagesUploadApi"
+        >
+          <div class="eladmin-upload"><i class="el-icon-upload" /> 添加文件</div>
+          <div slot="tip" class="el-upload__tip">可上传任意格式文件，且不超过100M</div>
+        </el-upload>
+      </el-form-item>
+      <el-form-item size="medium" style="text-align: left;margin-bottom: 45px;">
+        <el-button @click="$router.push('/publish/train')">返回</el-button>
+        <el-button :loading="submitLoading" type="primary" @click="isEdit===false?createData():updateData()">发布</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
+</template>
+
+<script>
+import Long from 'long'
+import { fileUpload, fileDelete } from '@/api/file'
+import crudTrainPublish from '@/api/publish/trainPublish'
+import { isExistTitle, getTrainContent } from '@/api/publish/trainPublish'
+import { getToken } from '@/utils/auth'
+import { mapGetters } from 'vuex'
+import CRUD, { presenter, header, crud } from '@crud/crud'
+import Editor from '@/views/components/Editor'
+
+// crud交由presenter持有
+const defaultCrud = CRUD({ requestType: 'post', url: 'train/getOrgTrains', crudMethod: { ...crudTrainPublish }})
+export default {
+  name: 'Pictures',
+  components: { Editor },
+  mixins: [presenter(defaultCrud), header(), crud()],
+  props: {
+    isEdit: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      form: {
+        id: null,
+        title: null,
+        content: null,
+        annexes: []
+      },
+      submitLoading: false,
+      noticesTypeOptions: [],
+      listQuery: {
+        current: 1,
+        pageSize: 10
+      },
+      headers: {
+        'Authorization': getToken()
+      },
+      pictures: [],
+      rules: {
+        title: [
+          { required: true, message: '请输入标题', trigger: 'blur' }
+        ]
+      },
+      pictureResult: {},
+      fileList: [],
+      pictureList: [],
+      uploadFileList: [],
+      isClear: false,
+      TitleExist: false,
+      TitleUnExist: false
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'baseApi',
+      'imagesUploadApi'
+    ])
+  },
+  created() {
+    if (this.isEdit) {
+      const row = this.$route.query.row
+      this.getTrainContent(row)
+      this.handleUpdate(row)
+    }
+  },
+  methods: {
+    isExistTitle() {
+      if (!this.isEdit) {
+        isExistTitle(this.form.title, 0).then(res => {
+          if (res === false) {
+            this.TitleUnExist = true
+            this.TitleExist = false
+          } else {
+            this.TitleExist = true
+            this.TitleUnExist = false
+          }
+        })
+      } else {
+        isExistTitle(this.form.title, this.form.id).then(res => {
+          if (res === false) {
+            this.TitleUnExist = true
+            this.TitleExist = false
+          } else {
+            this.TitleExist = true
+            this.TitleUnExist = false
+          }
+        })
+      }
+    },
+    handleUpdate(row) {
+      this.getTrainContent(row)
+      this.form.id = (Long.fromValue(row.id)).toString()
+      this.form.title = row.title
+      this.form.annexes = row.annexes
+      this.$nextTick(() => {
+        this.$refs['form'].clearValidate()
+      })
+    },
+    getTrainContent(row) {
+      getTrainContent((Long.fromValue(row.id)).toString()).then(res => {
+        this.form.content = res.content
+        this.uploadFileList = res.annexes
+      })
+    },
+    getEditorContent(data) {
+      this.form.content = data
+    },
+    resetForm() {
+      this.form = {
+        id: null,
+        title: null,
+        content: null,
+        annexes: []
+      }
+    },
+    createData() {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          this.submitLoading = true
+          if (this.TitleExist === true) {
+            this.$message({
+              message: '培训文章标题已经存在',
+              type: 'warning'
+            })
+            this.submitLoading = false
+            return false
+          } else if (!this.form.content) {
+            this.$message({
+              message: '培训内容不能为空',
+              type: 'warning'
+            })
+            this.submitLoading = false
+            return false
+          } else {
+            this.crud.crudMethod.add(JSON.stringify(this.form)).then(res => {
+              this.$message({
+                type: 'success',
+                message: '添加成功!'
+              })
+              this.submitLoading = false
+              this.$router.push('/publish/train')
+              this.crud.refresh()
+            }).catch(() => {
+              this.submitLoading = false
+            })
+          }
+        }
+      })
+    },
+    updateData() {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          this.submitLoading = true
+          if (this.TitleExist === true) {
+            this.$message({
+              message: '培训文章标题已经存在',
+              type: 'warning'
+            })
+            this.submitLoading = false
+            return false
+          } else if (!this.form.content) {
+            this.$message({
+              message: '培训内容不能为空',
+              type: 'warning'
+            })
+            this.submitLoading = false
+            return false
+          } else {
+            this.crud.crudMethod.edit(JSON.stringify(this.form)).then(res => {
+              this.$message({
+                type: 'success',
+                message: '修改成功!'
+              })
+              this.submitLoading = false
+              this.$router.push('/publish/train')
+              this.crud.refresh()
+            }).catch(() => {
+              this.submitLoading = false
+            })
+          }
+        }
+      })
+    },
+    changeNewsType(val) {
+      this.form.ntid = val
+    },
+    checkboxT(row, rowIndex) {
+      return row
+    },
+    // 文件上传
+    httpRequestFile(options) {
+      const formdata = new FormData()
+      formdata.append('myfile', options.file)
+      fileUpload(formdata).then(res => {
+        this.fileList.push({
+          'fid': (Long.fromValue(res.fid)).toString(),
+          'name': res.name,
+          'path': res.path
+        })
+        this.form.annexes.push({
+          'fid': (Long.fromValue(res.fid)).toString()
+        })
+      })
+    },
+    handleBeforeRemoveFile(file) {
+      for (let i = 0; i < this.fileList.length; i++) {
+        if (this.fileList[i].name === file.name) {
+          fileDelete(this.fileList[i]).then(res => {
+            this.form.annexes.some((item, index) => {
+              if (item.fid === this.fileList[i].fid) {
+                this.form.annexes.splice(index, 1)
+                return true
+              }
+            })
+          })
+          return true
+        }
+      }
+    },
+    handleSuccessFile(response, file, fileList) {
+      this.crud.notify('上传成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+      this.$refs.upload.clearFiles()
+      this.crud.status.add = CRUD.STATUS.NORMAL
+      this.crud.resetForm()
+      this.crud.toQuery()
+    },
+    // 监听上传失败
+    handleErrorFile(e, file, fileList) {
+      const msg = JSON.parse(e.message)
+      this.$notify({
+        title: msg.message,
+        type: 'error',
+        duration: 2500
+      })
+      this.loading = false
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+  .el-dialog-div {
+    margin-top: 20px;
+  }
+
+  .drawer-item {
+    font-size: 14px;
+    padding: 12px 0;
+  }
+
+</style>
